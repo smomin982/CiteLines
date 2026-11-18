@@ -3,6 +3,7 @@ import argparse
 import csv
 import io
 import json
+import heapq
 import sqlite3
 from collections import defaultdict, deque
 from dataclasses import dataclass
@@ -67,7 +68,10 @@ class CitationNetwork:
             if c.millis <= cutoff:
                 self.adj[c.post].add(c.key)
                 self.adj[c.key].add(c.post)
-                self.evidence.setdefault((c.post, c.key), c)
+                edge = (c.post, c.key)
+                prior = self.evidence.get(edge)
+                if prior is None or (c.millis, c.note, c.raw) < (prior.millis, prior.note, prior.raw):
+                    self.evidence[edge] = c
         # Sort once so equal-length routes and closure trials are reproducible.
         self.adj = {u: tuple(sorted(vs)) for u, vs in self.adj.items()}
 
@@ -98,9 +102,33 @@ class CitationNetwork:
             trials.append((key, backup, delta))
         return trials
 
-    def route(self, start, end, closed=None):
+    def first_connected(self, start, end):
+        """Earliest eligible instant and a minimum-transfer path at that instant."""
+        if not (start.isdigit() and end.isdigit() and start in self.adj and end in self.adj):
+            return None
+        first = min(self.evidence[start, page].millis for page in self.adj[start])
+        best, queue = {start: first}, [(first, start)]
+        while queue:
+            stamp, node = heapq.heappop(queue)
+            if best[node] != stamp:
+                continue
+            if node == end:
+                return stamp, self.route(start, end, through=stamp)
+            for nxt in self.adj[node]:
+                edge = (node, nxt) if node.isdigit() else (nxt, node)
+                candidate = max(stamp, self.evidence[edge].millis)
+                if nxt not in best or candidate < best[nxt]:
+                    best[nxt] = candidate
+                    heapq.heappush(queue, (candidate, nxt))
+        return None
+
+    def route(self, start, end, closed=None, *, through=None):
         """Return a shortest alternating path, or None for absent/unreachable posts."""
         if not (start.isdigit() and end.isdigit() and start in self.adj and end in self.adj):
+            return None
+        if through is not None and start == end and all(
+            self.evidence[start, key].millis > through for key in self.adj[start]
+        ):
             return None
         parent, todo = {start: None}, deque([start])
         while todo:
@@ -113,6 +141,10 @@ class CitationNetwork:
                 return path[::-1]
             for v in self.adj[u]:
                 if v != closed and v not in parent:
+                    if through is not None:
+                        edge = (u, v) if u.isdigit() else (v, u)
+                        if self.evidence[edge].millis > through:
+                            continue
                     parent[v] = u
                     todo.append(v)
         return None

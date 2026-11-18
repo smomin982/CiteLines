@@ -103,7 +103,27 @@ def render_view(params, snapshot, cases, parse_id):
                 f'<label>Destination (for a route)<input name="b" value="{escape(b)}"></label>'
                 f'<label>Include notes through (UTC)<input type="date" name="day" value="{day}" min="2025-01-01" max="2025-01-31"></label>'
                 '<button name="mode" value="route">Connect these posts</button><button name="mode" value="nearby">Explore from the start</button></form></details>')
-    if mode == "nearby":
+    if mode == "history":
+        body = ('<small>Connection history</small><h2>When did a citation chain first exist?</h2>'
+                f'<p>Looking at notes through {day:%d %B %Y}, UTC. A chain becomes possible once '
+                'every citation along it has appeared in the archive.</p>')
+        earliest = g.first_connected(a, b)
+        if earliest is None:
+            body += chain(g, None)
+        else:
+            stamp, old = earliest
+            now = g.route(a, b)
+            moment = datetime.fromtimestamp(stamp/1000, timezone.utc).isoformat(timespec="milliseconds")
+            then_count, now_count = len(old)//2, len(now)//2
+            body += (f'<article class="outcome"><small>First recorded connection (UTC)</small>'
+                     f'<h3><time datetime="{moment}">{moment.replace("T"," ").removesuffix("+00:00")}</time></h3>'
+                     f'<p>Shared pages needed then: <b>{then_count}</b>. By the selected date: <b>{now_count}</b>.</p></article>')
+            if now_count < then_count:
+                body += '<p>A shorter route appeared later. The shortcut alone would give the wrong first-connection date.</p>'
+            body += '<h3>Shortest chain at that first instant</h3>' + chain(g, old)
+            body += '<p>This dates the recorded citations, not when either author read or shared anything.</p>'
+        body += link("View the route at the selected date →", mode="route", **common)
+    elif mode == "nearby":
         body = ('<small>Explore a neighborhood</small><h2>Which posts are connected to this one?</h2>'
                 f'<p>Starting point: <strong>{escape(CAPTIONS.get(a, "Your selected X post"))}</strong>. '
                 'Select a result to see the sources that connect it.</p>')
@@ -147,9 +167,12 @@ def render_view(params, snapshot, cases, parse_id):
                 if backup:
                     body += '<details open><summary>Follow the backup route</summary>'+chain(g, backup)+'</details>'
                 body += '</article>'
+        body += '<p>'+link("When did these posts first connect? →", mode="history", **common)+'</p>'
         body += '<p>'+link("Explore other posts connected to the starting post →", mode="nearby", **common)+'</p>'
     demos = " &nbsp;·&nbsp; ".join(link(label, a=c["before"][0], b=c["before"][-1])
                                    for label,c in (("German voting debate",cases["detour"]),("A sultan’s portrait",cases["disconnected"])))
+    demos += " &nbsp;·&nbsp; " + link("A shortcut that appeared later", mode="history",
+                                      a="1876209456205398444", b="1879258365798539578")
     return '<section class="story">'+body+'</section><aside><b>Try a case:</b> '+demos+'</aside>'+controls
 
 

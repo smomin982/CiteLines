@@ -8,6 +8,8 @@ Read the five Notes TSV archives from X's November 17, 2026 snapshot ([source an
 
 ## Routing rules
 
+For clarity, the pilot's shortener rule excludes exactly the hosts `t.co`, `bit.ly`, `tinyurl.com`, and `ow.ly` (case-insensitive); it does not discover redirects or mark each rejected row in SQLite. A page-key collision is not evidence that two documents have identical contents.
+
 - An eligible edge connects an annotated post to a page cited by at least one note created at or before the cutoff. The cutoff defaults to the last millisecond of January. Hop times need not increase.
 - A transfer is `post → page → post`. Only posts with eligible citations are queryable. A present post reaches itself in zero transfers. An absent or unreachable endpoint yields `path: null`, `transfers: null`, and no evidence.
 - Closing a page excludes it for that query only. The route may stay equally short, grow longer, or disappear. For ties, BFS visits neighbors in ascending string-key order.
@@ -15,6 +17,8 @@ Read the five Notes TSV archives from X's November 17, 2026 snapshot ([source an
 - Stress testing independently excludes each page on the selected shortest path, returning a backup and transfer delta or a disconnected result. With k pages on the path this takes at most k additional BFS traversals. The web interface caches one end-of-day snapshot. Deterministic neighbor ordering adds a one-time sorting cost of O(sum of degree(v) log degree(v)) during snapshot preparation.
 
 ## DS&A decision
+
+**Connection history:** For two posts, return the earliest instant within the selected January snapshot at which *any* eligible citation chain exists. Use the earliest supporting note time on each edge regardless of input order. The activation time of a path is the maximum of its edge times; minimize that maximum using a priority queue. When a post is queried against itself, its first eligible citation establishes its presence. Return no result for an absent or disconnected pair. At the winning instant run thresholded BFS to select the shortest route available then, with the usual sorted-neighbor tie rule. The two stages take O((V+E) log(V+E)) time and O(V+E) auxiliary space with lazy heap entries. This dates a snapshot connection, not the transmission of information. A slower exact reference rebuilds the graph and runs BFS at every distinct event time.
 
 BFS on the undirected bipartite adjacency lists minimizes edges and thus transfers (each transfer has exactly two edges). Given R eligible evidence records, graph construction takes expected O(R) time; the graph and one witness per edge use O(V+E) space for V nodes and E distinct connections. On the prepared graph, a query scans at most O(V+E) in time and uses O(V) extra space, including parents. The checkpoint CLI rebuilds the graph per invocation; timings of an entire command therefore include database loading.
 

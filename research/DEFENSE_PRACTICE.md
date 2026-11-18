@@ -1,0 +1,8 @@
+# Practice the acceptance argument
+
+Use these as prompts rather than a script. Answer each aloud, then write 100–150 words in your own words. For each answer give an example, the evidence, and a limitation.
+
+1. **Why retain page nodes instead of connecting posts directly?** Draw two posts sharing two URLs. Remove one URL: what must a post-only edge remember to avoid incorrectly disconnecting them? Tie this to the measured 140,319 bipartite edges versus 9,820,538 projected edges. Distinguish representation size from query speed; both properly implemented models produced the same answers on the benchmark queries.
+2. **How could 97% of pairs depend on a page if only 44% of removals disconnected them?** Draw a three-page chain with alternatives around two pages but none around the third. It counts once as a fragile pair and contributes just one disconnect in three trials. Then give the actual denominators (485/500 pairs, 1,236/2,812 trials). Explain why uniform sampling of connected pairs is not uniform sampling of posts or pages.
+3. **What would actually prove the router wrong?** A valid path can still be too long. Explain how independently enumerating simple paths in all 512 tiny topologies catches a valid-but-long answer, and why that test cannot catch a bad URL normalizer. Point to the TSV-to-SQLite regression for the latter and the real detour for an end-to-end example.
+4. **Why can't we just date the current shortest route?** Draw a long route complete on January 10 and a direct shared page added January 30. For each route take the latest edge timestamp; across routes take the earliest such value. Explain why a second BFS at that time selects the shortest chain then, and why none of this proves a person followed the chain.

@@ -38,3 +38,8 @@
 - **Request:** Execute the 500-pair study, publish its findings in the interface, and benchmark the design.
 - **Choices:** Sample uniformly over connected unordered post pairs. Use independent closures and report pair and trial denominators separately. Keep the trial evidence in CSV, compare two exact representations on five prefixes, and check BFS against independently enumerated paths.
 - **Finding:** Pair-level fragility coexists with most individual removals leaving a route intact. Report both denominators and identify the contribution of single-page endpoints.
+
+### 2026-11-18 — Internal audit, defense practice and connection history
+
+- **Request:** Continue the contract review and defense preparation, defer the classmate exercise and packaging, and develop additional features.
+- **Kept:** An internal audit with source-to-database checks and an interactive first-connection view. The earliest complete chain can precede the current shortest chain; compare against rebuilding each snapshot on a small graph. Practice prompts tie design choices to actual measurements. External feedback remains pending.
