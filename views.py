@@ -80,6 +80,15 @@ def findings(summary, site_summary=None):
     return "".join(body)
 
 
+def note_excerpt(c):
+    """Show a bounded, attributed excerpt from the witness, never inferred post text."""
+    if not c.summary:
+        return "<small>Note text unavailable in this database.</small>"
+    text = " ".join(c.summary.split())
+    excerpt = text if len(text) <= 280 else text[:279].rstrip() + "…"
+    return f'<blockquote dir="auto">{escape(excerpt)}</blockquote>'
+
+
 def chain(g, path):
     if not path:
         return "<p>There is no chain of shared pages between these posts by this date.</p>"
@@ -94,7 +103,7 @@ def chain(g, path):
             cites = [g.evidence[p, item] for p in (path[i-1], path[i+1])]
             proof = "".join(f"<li>Post {escape(c.post)} · note {escape(c.note)} · "
                             f"{datetime.fromtimestamp(c.millis/1000, timezone.utc):%d %b %Y} UTC"
-                            f"<br>{escape(c.raw)}</li>" for c in cites)
+                            f"<br>{escape(c.raw)}{note_excerpt(c)}</li>" for c in cites)
             nodes.append(f'<li class="source"><small>Both posts cite</small>'
                          f'<b><a href="{escape(item)}" target="_blank" rel="noreferrer">{escape(title(item))}</a></b>'
                          f'<details><summary>Inspect both citations</summary><ul>{proof}</ul></details></li>')
@@ -239,6 +248,7 @@ def render_view(params, snapshot, cases, parse_id):
 
 
 STYLE = """
+blockquote{margin:.5em 0;padding:.4em .9em;border-inline-start:3px solid #91afa1;background:#f6f7f2;overflow-wrap:anywhere}
 .strip{display:flex;align-items:center;flex-wrap:wrap;gap:.4em;font-size:.88em}.chip{border:1px solid #91afa1;border-radius:.5em;padding:.2em .5em;background:white;overflow-wrap:anywhere;max-width:100%}
 :root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f4f2eb;color:#183733;font:17px/1.55 system-ui,sans-serif}
 main{max-width:860px;margin:auto;padding:24px clamp(14px,4vw,40px) 60px}header{padding:18px 0 24px}h1{font:700 clamp(32px,5vw,48px)/1.1 Georgia,serif;margin:12px 0}

@@ -22,7 +22,10 @@ BASE = CASES["detour"]["before"]
 def load_network(db, day):
     cutoff = int(datetime.combine(day, datetime.max.time(), timezone.utc).timestamp() * 1000)
     with sqlite3.connect(db.as_uri() + "?mode=ro", uri=True) as conn:
-        rows = conn.execute("SELECT post,page,note,raw,millis FROM citations WHERE millis<=? "
+        enriched = conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='note_text'").fetchone()
+        extra = ",summary" if enriched else ""
+        join = " LEFT JOIN note_text USING(note)" if enriched else ""
+        rows = conn.execute(f"SELECT post,page,note,raw,millis{extra} FROM citations{join} WHERE millis<=? "
                             "ORDER BY post,page,millis,note,raw", (cutoff,))
         return CitationNetwork((Citation(*r) for r in rows), cutoff)
 

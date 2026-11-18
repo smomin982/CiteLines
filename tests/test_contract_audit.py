@@ -16,6 +16,8 @@ def test_data_contract_from_tsv_to_database(tmp_path):
         z.writestr("part.tsv", header+"".join("\t".join(map(str,r))+"\n" for r in lines))
     with sqlite3.connect(":memory:") as db:
         build(db,[archive])
+        assert db.execute("SELECT count(*) FROM note_text").fetchone()[0] == 2
+        assert db.execute("SELECT summary FROM note_text WHERE note='2'").fetchone()[0] == f"{raw} {raw}"
         assert db.execute("SELECT post,page,note,raw,millis FROM citations ORDER BY post").fetchall() == [
             ("10","https://example.org/watch?v=A","2",raw,START),
             ("20",other,"3",other,END-1)]

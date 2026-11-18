@@ -53,3 +53,8 @@
 
 - **Request:** Build a source-first entry point, run the matched site study, and show three compact route states.
 - **Decisions:** Count distinct posts, not notes. Preserve the visitor's selected shared page for closure comparisons, even when another URL wins a shortest-path tie. Reuse all surviving trial rows and cache identical pair/site queries without collapsing their statistical weights. Report the concentration of lost backups on `x.com` alongside the overall rate.
+
+### 2026-11-18 — Evidence-first pair selection
+
+- **Request:** Continue implementing the source-first explorer.
+- **Kept:** Store original summaries locally once per note, attach excerpts to dated witnesses, and select posts directly from their note cards. Older databases remain readable. Showing contributor wording avoids inventing a description of an unavailable original post.

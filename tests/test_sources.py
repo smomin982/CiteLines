@@ -42,3 +42,17 @@ def test_site_trials_match_surviving_page_trials_exactly():
         d = r["site_transfers"]
         assert not d or int(d) >= int(r["backup_transfers"])
         assert r["site_outcome"] == ("lost" if not d else "same_length" if d == r["backup_transfers"] else "longer")
+
+
+def test_picker_keeps_origin_across_pages_and_uses_eligible_note_text():
+    key = "https://demo.org/p"
+    records = [Citation(str(i),key,str(i),key,1,f"Note about <topic {i}>") for i in range(21)]
+    records += [Citation("0",key,"future",key,15,"A future summary")]
+    snapshot = lambda day: CitationNetwork(records, day.day)
+    view = render(dict(mode="sources",q=key,first="0",day="2025-01-01"), snapshot)
+    assert "Note about &lt;topic 0&gt;" in view and "A future summary" not in view
+    assert "Next 20" in view and "first=0" in view
+    next_page = render(dict(mode="sources",q=key,first="0",day="2025-01-01",offset="20"),snapshot)
+    assert "Compare page vs. site" in next_page and "a=0&amp;b=9" in next_page
+    with pytest.raises(ValueError):
+        render(dict(mode="sources",q=key,first="other-post"),snapshot)

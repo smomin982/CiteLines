@@ -25,6 +25,7 @@ class Citation:
     note: str
     raw: str
     millis: int
+    summary: str = ""
 
 
 def citations(archives):
@@ -47,7 +48,7 @@ def citations(archives):
                             raw = raw[:-1]
                         key = page(raw)
                         if key:
-                            yield Citation(r["tweetId"], key, r["noteId"], raw, millis)
+                            yield Citation(r["tweetId"], key, r["noteId"], raw, millis, r["summary"])
 
 
 def build(db, archives):
@@ -56,8 +57,11 @@ def build(db, archives):
         db.execute("BEGIN")
         db.execute("CREATE TABLE citations(post TEXT, page TEXT, note TEXT, raw TEXT, millis INTEGER,"
                    " PRIMARY KEY(post,page,note,raw))")
-        db.executemany("INSERT OR IGNORE INTO citations VALUES(?,?,?,?,?)",
-                       ((c.post, c.key, c.note, c.raw, c.millis) for c in citations(archives)))
+        db.execute("CREATE TABLE note_text(note TEXT PRIMARY KEY, summary TEXT NOT NULL)")
+        for c in citations(archives):
+            db.execute("INSERT OR IGNORE INTO note_text VALUES(?,?)", (c.note, c.summary))
+            db.execute("INSERT OR IGNORE INTO citations VALUES(?,?,?,?,?)",
+                       (c.post, c.key, c.note, c.raw, c.millis))
 
 
 class CitationNetwork:

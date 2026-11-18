@@ -8,6 +8,8 @@ Read the five Notes TSV archives from X's November 17, 2026 snapshot ([source an
 
 ## Routing rules
 
+**Evidence text:** New databases retain one original `summary` per citing note ID. The explorer shows the selected edge witness's text, with whitespace collapsed and at most 280 characters including the truncation marker. Excerpts come from proposed notes, not from annotated posts. Legacy databases without text keep the same graph results. Choosing a starting post on an article page is valid only if its note is eligible at the selected cutoff.
+
 For clarity, the pilot's shortener rule excludes exactly the hosts `t.co`, `bit.ly`, `tinyurl.com`, and `ow.ly` (case-insensitive); it does not discover redirects or mark each rejected row in SQLite. A page-key collision is not evidence that two documents have identical contents.
 
 - An eligible edge connects an annotated post to a page cited by at least one note created at or before the cutoff. The cutoff defaults to the last millisecond of January. Hop times need not increase.

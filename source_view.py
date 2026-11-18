@@ -4,7 +4,7 @@ from urllib.parse import urlsplit
 
 from domains import page_site
 from research.pilot import page
-from views import CAPTIONS, link, title
+from views import CAPTIONS, link, note_excerpt, title
 
 
 def source_view(graph, params, day):
@@ -31,21 +31,28 @@ def source_view(graph, params, day):
         body.append(f'<h3>{escape(title(key))}</h3><p>{escape(key)}</p>'
                     f'<p><b>{len(posts):,} distinct citing posts</b> through {day}.</p>')
         if len(posts) >= 2:
-            # Do not generate all post pairs or render unbounded dropdowns.
-            a,b = posts[:2]
-            body.append('<p>Try the first two posts below, or paste any two IDs from this page’s list.</p>'
-                        '<form><input type="hidden" name="mode" value="source_pair">'
-                        f'<input type="hidden" name="page" value="{escape(key)}">'
-                        f'<input type="hidden" name="day" value="{day}">'
-                        f'<label>First post<input name="a" value="{escape(a)}"></label>'
-                        f'<label>Second post<input name="b" value="{escape(b)}"></label>'
-                        '<label>Investigate<select name="action"><option value="compare">Remove page or site</option>'
-                        '<option value="route">Shortest route</option><option value="history">Connection history</option>'
-                        '</select></label><button>Inspect pair</button></form>')
+            body.append('<p>Read what the contributors wrote, then choose two posts to compare. '
+                        'These are proposed notes, not the original posts.</p>')
+        first = params.get("first")
+        if first:
+            if (first,key) not in graph.evidence:
+                raise ValueError("The starting post does not cite this page by that date.")
+            base["first"] = first
+            body.append(f'<article class="outcome"><small>Selected first post</small>'
+                        f'{note_excerpt(graph.evidence[first,key])}'+
+                        link("Choose a different starting post",mode="sources",day=str(day),q=q,offset=offset)+'</article>')
         for p in posts[offset:offset+20]:
             c = graph.evidence[p,key]
             body.append('<div class="result">'+link(CAPTIONS.get(p, "Post "+p),mode="nearby",a=p,day=str(day))+
-                        f'<br><small>Post {escape(p)} · note {escape(c.note)}</small></div>')
+                        f'<br><small>Proposed note {escape(c.note)}</small>'+note_excerpt(c))
+            if not first and len(posts) >= 2:
+                body.append(link("Start with this post",q=q,offset=offset,first=p,**base))
+            elif first and first != p:
+                pair = dict(mode="source_pair", page=key, day=str(day), a=first, b=p)
+                body.append(" · ".join(link(label,action=action,**pair) for label,action in
+                                       (("Compare page vs. site","compare"),("View route","route"),
+                                        ("See connection history","history"))))
+            body.append("</div>")
         size = len(posts)
         if not size:
             body.append('<p>No match for this page key. Try the bare domain to browse other URL variants.</p>')
