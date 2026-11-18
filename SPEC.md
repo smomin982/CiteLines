@@ -10,7 +10,9 @@ Read the five Notes TSV archives from X's November 17, 2026 snapshot ([source an
 
 - An eligible edge connects an annotated post to a page cited by at least one note created at or before the cutoff. The cutoff defaults to the last millisecond of January. Hop times need not increase.
 - A transfer is `post → page → post`. Only posts with eligible citations are queryable. A present post reaches itself in zero transfers. An absent or unreachable endpoint yields `path: null`, `transfers: null`, and no evidence.
-- Closing a page excludes it for that query only. The route may stay equally short, grow longer, or disappear. When shortest routes tie, any minimum route is correct; no stable tie order is promised at checkpoint.
+- Closing a page excludes it for that query only. The route may stay equally short, grow longer, or disappear. For ties, BFS visits neighbors in ascending string-key order.
+- The browser neighborhood groups distinct destinations by minimum transfer distance (one or two), excluding the origin. Counts include every destination; at most 25 IDs are shown per group.
+- Stress testing independently excludes each page on the selected shortest path, returning a backup and transfer delta or a disconnected result. With k pages on the path this takes at most k additional BFS traversals. The web interface caches one end-of-day snapshot. Deterministic neighbor ordering adds a one-time sorting cost of O(sum of degree(v) log degree(v)) during snapshot preparation.
 
 ## DS&A decision
 

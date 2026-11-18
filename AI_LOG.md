@@ -22,3 +22,8 @@
 
 - **Update:** The student reported instructor approval. The assistant implemented the planned CLI checkpoint on a new branch.
 - **Kept and checked:** Reused the pilot URL keys to preserve comparability. Added SQLite evidence storage, BFS routing, cutoff and closure tests. Checked both pilot pairs against the CLI before and after closure. Left stable tie selection and the broader empirical analysis for the final build.
+
+### 2026-11-17 — Explorer enhancement
+
+- **Request:** Enhance the checkpoint app. Added a local browser interface, bounded neighborhoods and independent closure trials along a selected route.
+- **Design choice:** Use a standard-library local server rather than require Streamlit, so the same Python installation and existing SQLite database run both interfaces. Sort adjacency lists once for repeatable tie selection; keep closure trials independent so an early disconnection cannot contaminate later results.

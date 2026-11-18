@@ -68,6 +68,35 @@ class CitationNetwork:
                 self.adj[c.post].add(c.key)
                 self.adj[c.key].add(c.post)
                 self.evidence.setdefault((c.post, c.key), c)
+        # Sort once so equal-length routes and closure trials are reproducible.
+        self.adj = {u: tuple(sorted(vs)) for u, vs in self.adj.items()}
+
+    def nearby(self, start, radius):
+        """Map each reachable post (except start) to its minimum 1–2 transfer distance."""
+        if radius not in (1, 2):
+            raise ValueError("Radius must be one or two transfers")
+        if not start.isdigit() or start not in self.adj:
+            return {}
+        depth = {start: 0}
+        queue = deque([start])
+        while queue:
+            node = queue.popleft()
+            if depth[node] == 2 * radius:
+                continue
+            for nxt in self.adj[node]:
+                if nxt not in depth:
+                    depth[nxt] = depth[node] + 1
+                    queue.append(nxt)
+        return {n: d // 2 for n, d in depth.items() if d and d % 2 == 0}
+
+    def closures(self, path):
+        """Independently exclude each page on a shortest path; report backup and cost."""
+        trials = []
+        for key in path[1::2]:
+            backup = self.route(path[0], path[-1], key)
+            delta = None if backup is None else (len(backup) - len(path)) // 2
+            trials.append((key, backup, delta))
+        return trials
 
     def route(self, start, end, closed=None):
         """Return a shortest alternating path, or None for absent/unreachable posts."""
