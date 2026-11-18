@@ -1,5 +1,14 @@
 # January 2025 feasibility pilot
 
+**Result: both proposed demo cases exist in January alone.** In the November 17, 2026 snapshot, January contained 113,274 notes about 77,256 posts. The pilot found 140,319 distinct post–page connections; 13,482 of the 91,067 normalized pages appeared on multiple posts. Of all annotated posts, 36,353 could reach at least one other post under these rules.
+
+| Closure | Evidence and outcome |
+| --- | --- |
+| Remove the Arabic Wikipedia biography of Said bin Sultan. | The two example posts each had only this one eligible cited URL. Both endpoints became isolated. |
+| Remove the German Wikipedia page *Demokratie*. | The endpoints lost their only shared URL. A third post linked them via a *Frankfurter Rundschau* article and the Bundestag seat-distribution page instead: one transfer became two. |
+
+All eight edge witnesses across these examples used identical raw and normalized URLs; neither result relies on merging URL variants. The independent source-row check passed for both. See `january.json` for exact posts, notes, timestamps, and checksums. In the wider normalization sample, fragment removal correctly grouped section links at page level and different BBC articles stayed distinct. HTML-escaped query separators and mobile/desktop variants merit further work before estimating population rates.
+
 `pilot.py` filters one cumulative snapshot, not one file per day. Use Python 3.11+ and the five Notes ZIPs under `https://ton.twimg.com/birdwatch-public-data/2026/11/17/notes/`. Run from the repository root. Example in PowerShell (keep raw data outside Git):
 
 ```powershell

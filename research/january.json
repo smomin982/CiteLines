@@ -1,0 +1,226 @@
+{
+  "snapshot": "2026-11-17",
+  "window": "[2025-01-01, 2025-02-01) UTC",
+  "archives": [
+    {
+      "member": "notes-00000.tsv",
+      "archive_sha256": "5ced55ff86de603a2a03308737d79b27b80b3d61205c7e9352310432d9f69eda",
+      "rows": 3248385,
+      "january_rows": 113274
+    },
+    {
+      "member": "notes-00001.tsv",
+      "archive_sha256": "2274b316b7e725cd0671b62b6140ed79d877649aa832bfdf8949888477db6e14",
+      "rows": 19954,
+      "january_rows": 0
+    },
+    {
+      "member": "notes-00002.tsv",
+      "archive_sha256": "895f2680e6a87a521cdad4afab065bdf0036089c5f04d7ef2f635ef4ae286f43",
+      "rows": 19432,
+      "january_rows": 0
+    },
+    {
+      "member": "notes-00003.tsv",
+      "archive_sha256": "33a8840797d07e2f2d7735036604986e7e584a526ac3196c7e9a8701fe7ad0e7",
+      "rows": 19601,
+      "january_rows": 0
+    },
+    {
+      "member": "notes-00004.tsv",
+      "archive_sha256": "5df0d45ab510f9bfd15fd73f2c51cabefdb907d85ae6e33c51969207c0bc34e0",
+      "rows": 19476,
+      "january_rows": 0
+    }
+  ],
+  "profile": {
+    "excluded_url_occurrences": 1947,
+    "notes": 113274,
+    "posts": 77256,
+    "posts_with_pages": 74344,
+    "pages": 91067,
+    "shared_pages": 13482,
+    "edges": 140319,
+    "posts_reaching_another": 36353
+  },
+  "cases": {
+    "disconnected": {
+      "before": [
+        "1877374179705487627",
+        "https://ar.m.wikipedia.org/wiki/%D8%B3%D8%B9%D9%8A%D8%AF_%D8%A8%D9%86_%D8%B3%D9%84%D8%B7%D8%A7%D9%86_%D8%A7%D9%84%D8%A8%D9%88%D8%B3%D8%B9%D9%8A%D8%AF%D9%8A",
+        "1877389658193277027"
+      ],
+      "removed": "https://ar.m.wikipedia.org/wiki/%D8%B3%D8%B9%D9%8A%D8%AF_%D8%A8%D9%86_%D8%B3%D9%84%D8%B7%D8%A7%D9%86_%D8%A7%D9%84%D8%A8%D9%88%D8%B3%D8%B9%D9%8A%D8%AF%D9%8A",
+      "after": null,
+      "witnesses": [
+        {
+          "post": "1877374179705487627",
+          "page": "https://ar.m.wikipedia.org/wiki/%D8%B3%D8%B9%D9%8A%D8%AF_%D8%A8%D9%86_%D8%B3%D9%84%D8%B7%D8%A7%D9%86_%D8%A7%D9%84%D8%A8%D9%88%D8%B3%D8%B9%D9%8A%D8%AF%D9%8A",
+          "raw": "https://ar.m.wikipedia.org/wiki/%D8%B3%D8%B9%D9%8A%D8%AF_%D8%A8%D9%86_%D8%B3%D9%84%D8%B7%D8%A7%D9%86_%D8%A7%D9%84%D8%A8%D9%88%D8%B3%D8%B9%D9%8A%D8%AF%D9%8A",
+          "note": "1877458847456960998",
+          "created_at_utc": "2025-01-09T20:54:05.390000+00:00"
+        },
+        {
+          "post": "1877389658193277027",
+          "page": "https://ar.m.wikipedia.org/wiki/%D8%B3%D8%B9%D9%8A%D8%AF_%D8%A8%D9%86_%D8%B3%D9%84%D8%B7%D8%A7%D9%86_%D8%A7%D9%84%D8%A8%D9%88%D8%B3%D8%B9%D9%8A%D8%AF%D9%8A",
+          "raw": "https://ar.m.wikipedia.org/wiki/%D8%B3%D8%B9%D9%8A%D8%AF_%D8%A8%D9%86_%D8%B3%D9%84%D8%B7%D8%A7%D9%86_%D8%A7%D9%84%D8%A8%D9%88%D8%B3%D8%B9%D9%8A%D8%AF%D9%8A",
+          "note": "1877457823883268465",
+          "created_at_utc": "2025-01-09T20:50:01.351000+00:00"
+        }
+      ],
+      "endpoint_page_counts": [
+        1,
+        1
+      ]
+    },
+    "detour": {
+      "before": [
+        "1882827830331085172",
+        "https://de.m.wikipedia.org/wiki/Demokratie",
+        "1884646064566796739"
+      ],
+      "removed": "https://de.m.wikipedia.org/wiki/Demokratie",
+      "after": [
+        "1882827830331085172",
+        "https://www.fr.de/politik/cdu-weist-vergiftete-weidel-offerte-bei-migration-zurueck-93532856.html",
+        "1882791142183592080",
+        "https://www.bundestag.de/parlament/plenum/sitzverteilung_20wp",
+        "1884646064566796739"
+      ],
+      "witnesses": [
+        {
+          "post": "1882827830331085172",
+          "page": "https://de.m.wikipedia.org/wiki/Demokratie",
+          "raw": "https://de.m.wikipedia.org/wiki/Demokratie",
+          "note": "1882924240758042751",
+          "created_at_utc": "2025-01-24T22:51:36.694000+00:00"
+        },
+        {
+          "post": "1884646064566796739",
+          "page": "https://de.m.wikipedia.org/wiki/Demokratie",
+          "raw": "https://de.m.wikipedia.org/wiki/Demokratie",
+          "note": "1884660074825867328",
+          "created_at_utc": "2025-01-29T17:49:11.786000+00:00"
+        },
+        {
+          "post": "1882827830331085172",
+          "page": "https://www.fr.de/politik/cdu-weist-vergiftete-weidel-offerte-bei-migration-zurueck-93532856.html",
+          "raw": "https://www.fr.de/politik/cdu-weist-vergiftete-weidel-offerte-bei-migration-zurueck-93532856.html",
+          "note": "1882836827649810494",
+          "created_at_utc": "2025-01-24T17:04:15.786000+00:00"
+        },
+        {
+          "post": "1882791142183592080",
+          "page": "https://www.fr.de/politik/cdu-weist-vergiftete-weidel-offerte-bei-migration-zurueck-93532856.html",
+          "raw": "https://www.fr.de/politik/cdu-weist-vergiftete-weidel-offerte-bei-migration-zurueck-93532856.html",
+          "note": "1882795682341216728",
+          "created_at_utc": "2025-01-24T14:20:45.980000+00:00"
+        },
+        {
+          "post": "1882791142183592080",
+          "page": "https://www.bundestag.de/parlament/plenum/sitzverteilung_20wp",
+          "raw": "https://www.bundestag.de/parlament/plenum/sitzverteilung_20wp",
+          "note": "1882798007915069828",
+          "created_at_utc": "2025-01-24T14:30:00.439000+00:00"
+        },
+        {
+          "post": "1884646064566796739",
+          "page": "https://www.bundestag.de/parlament/plenum/sitzverteilung_20wp",
+          "raw": "https://www.bundestag.de/parlament/plenum/sitzverteilung_20wp",
+          "note": "1884709222505439259",
+          "created_at_utc": "2025-01-29T21:04:29.506000+00:00"
+        }
+      ],
+      "endpoint_page_counts": [
+        2,
+        4
+      ]
+    }
+  },
+  "normalization_samples": {
+    "merged": [
+      [
+        "https://www.verifythis.com/article/news/verify/money-verify/yes-los-angeles-cut-176-million-from-the-lafd-fire-departments-budget/536-4b902910-08f5-42d5-bc5e-bdfad1cb0560#:~:text=the%20city%E2%80%99s%20General%20Fund%20budget%20for%20this%20fiscal%20year%20includes%20an%20undisclosed%20amount",
+        "https://www.verifythis.com/article/news/verify/money-verify/yes-los-angeles-cut-176-million-from-the-lafd-fire-departments-budget/536-4b902910-08f5-42d5-bc5e-bdfad1cb0560"
+      ],
+      [
+        "https://www.statista.com/statistics/292460/video-game-consumer-market-value-worldwide-platform/#:~:text=Console%20%26%20PC%20gaming%20consumer%20market,worldwide%202020%2D2026%2C%20by%20distribution&amp;text=In%202023%2C%20the%20digital%20console,the%20digital%20PC%20gaming%20market",
+        "https://www.statista.com/statistics/292460/video-game-consumer-market-value-worldwide-platform/"
+      ],
+      [
+        "https://elizabeth-olsen.com/photos/displayimage.php?album=724&amp;pid=51827#top_display_media",
+        "https://elizabeth-olsen.com/photos/displayimage.php?album=724&amp;pid=51827"
+      ],
+      [
+        "https://www.abc.es/espana/comunidad-valenciana/familia-valenciana-accidentada-tailandia-pagado-32000-euros-20250114094350-nt.html#vca=cm-general&amp;vso=rrss&amp;vmc=tw&amp;vli=abc-es",
+        "https://www.abc.es/espana/comunidad-valenciana/familia-valenciana-accidentada-tailandia-pagado-32000-euros-20250114094350-nt.html"
+      ],
+      [
+        "https://www.cartercenter.org/news/pr/2024/venezuela-073024.html#spanish",
+        "https://www.cartercenter.org/news/pr/2024/venezuela-073024.html"
+      ],
+      [
+        "https://unstats.un.org/unsd//geoinfo/UNGEGN/docs/Training/Manila/1_Special_aspects_of_marine_naming.pdf?utm_source=chatgpt.com",
+        "https://unstats.un.org/unsd//geoinfo/UNGEGN/docs/Training/Manila/1_Special_aspects_of_marine_naming.pdf"
+      ],
+      [
+        "https://en.wikipedia.org/wiki/Boom_Technology?wprov=sfti1#History",
+        "https://en.wikipedia.org/wiki/Boom_Technology?wprov=sfti1"
+      ],
+      [
+        "https://macedoniadelnorte.com",
+        "https://macedoniadelnorte.com/"
+      ],
+      [
+        "https://cne.gob.ve",
+        "https://cne.gob.ve/"
+      ],
+      [
+        "https://www.servimedia.es/noticias/pp-vox-junts-tumban-decreto-omnibus-revalorizaba-pensiones-prorrogaba-ayudas-transporte/1411446794#:~:text=El%20PP%2C%20Vox%20y%20Junts%20unieron%20sus%20votos,alberga%20la%20sede%20del%20Instituto%20Cervantes%20en%20Par%C3%ADs",
+        "https://www.servimedia.es/noticias/pp-vox-junts-tumban-decreto-omnibus-revalorizaba-pensiones-prorrogaba-ayudas-transporte/1411446794"
+      ]
+    ],
+    "distinct_same_host": [
+      [
+        "https://x.com/mtracey/status/1877609734418641372",
+        "https://x.com/sarahiscensored/status/1883231427862409530?s=46"
+      ],
+      [
+        "https://en.wikipedia.org/wiki/Apeel_Sciences",
+        "https://en.wikipedia.org/wiki/Sa_Aking_Mga_Kabata"
+      ],
+      [
+        "https://x.com/mtracey/status/1877609734418641372",
+        "https://x.com/DictionaryData/status/1882079882425020547"
+      ],
+      [
+        "https://www.bbc.co.uk/news/uk-england-manchester-64837721",
+        "https://www.bbc.co.uk/news/articles/cgr0xrlwq25o"
+      ],
+      [
+        "https://x.com/mtracey/status/1877609734418641372",
+        "http://x.com/elonmusk"
+      ],
+      [
+        "https://www.bbc.co.uk/news/uk-england-manchester-64837721",
+        "https://www.bbc.co.uk/news/articles/cg45y4r0yngo"
+      ],
+      [
+        "https://www.bbc.co.uk/news/uk-england-manchester-64837721",
+        "https://www.bbc.co.uk/news/articles/cg45y4r0yngo"
+      ],
+      [
+        "https://x.com/mtracey/status/1877609734418641372",
+        "https://x.com/Superpensiones/status/1875247892811935775"
+      ],
+      [
+        "https://x.com/mtracey/status/1877609734418641372",
+        "https://x.com/therealbuni/status/1877436818414555597/photo/1"
+      ],
+      [
+        "https://www.yahoo.com/news/stellantis-touts-us-factory-investments-175640973.html",
+        "https://www.yahoo.com/entertainment/mark-zuckerberg-rings-wife-priscilla-002806085.html"
+      ]
+    ]
+  }
+}
