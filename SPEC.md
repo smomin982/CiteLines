@@ -8,6 +8,8 @@ Read the five Notes TSV archives from X's November 17, 2026 snapshot ([source an
 
 ## Routing rules
 
+**Topic search:** SQLite FTS5's `unicode61` tokenizer indexes note prose with explicit HTTP(S) URLs removed. A word or multiword input is a literal phrase of adjacent tokens, not a Boolean expression or semantic match. A page counts a post once if at least one eligible note on that post both matches the phrase and cites that page. Results sort by descending distinct matching posts and then normalized URL, 20 at a time. Excerpts use the matching note (smallest stored note rowid among eligible witnesses for the group). The topic constrains discovery; the resulting route and closure experiments use all eligible citations at the same cutoff.
+
 **Evidence text:** New databases retain one original `summary` per citing note ID. The explorer shows the selected edge witness's text, with whitespace collapsed and at most 280 characters including the truncation marker. Excerpts come from proposed notes, not from annotated posts. Legacy databases without text keep the same graph results. Choosing a starting post on an article page is valid only if its note is eligible at the selected cutoff.
 
 For clarity, the pilot's shortener rule excludes exactly the hosts `t.co`, `bit.ly`, `tinyurl.com`, and `ow.ly` (case-insensitive); it does not discover redirects or mark each rejected row in SQLite. A page-key collision is not evidence that two documents have identical contents.

@@ -13,6 +13,8 @@ from urllib.parse import parse_qs, urlsplit
 from route_map import Citation, CitationNetwork
 from views import STYLE, findings, render_view
 from source_view import source_view
+from topic_view import topic_view
+from contextlib import closing
 
 ROOT = Path(__file__).resolve().parent
 CASES = json.loads((ROOT / "research/january.json").read_text(encoding="utf-8"))["cases"]
@@ -73,7 +75,12 @@ def main():
                 self.send_error(404)
                 return
             try:
-                body = render({k: v[-1] for k, v in parse_qs(url.query).items()}, snapshot)
+                params = {k:v[-1] for k,v in parse_qs(url.query).items()}
+                if params.get("mode") == "topics":
+                    with closing(sqlite3.connect(db.as_uri()+"?mode=ro",uri=True)) as conn:
+                        body = topic_view(conn,params)
+                else:
+                    body = render(params, snapshot)
                 code = 200
             except ValueError as exc:
                 body, code = f'<p>{escape(str(exc))}</p><a href="/">Reset explorer</a>', 400
@@ -82,7 +89,7 @@ def main():
                     '<main><header><small>CiteLines / January 2025</small><h1>What connects two posts on X?</h1>'
                     '<p>People write <b>Community Notes</b> to add context to posts on X. When notes on two posts link to the same page, '
                     'CiteLines draws a connection. Follow one below, then see what happens without that source.</p>'
-                    '<nav><a href="/">Explore a route</a> · <a href="?mode=sources">Explore by source</a> · <a href="?mode=findings">What we found</a></nav></header>'
+                    '<nav><a href="?mode=topics">Search by topic</a> · <a href="/">Explore a route</a> · <a href="?mode=sources">Explore by source</a> · <a href="?mode=findings">What we found</a></nav></header>'
                     + body + '<footer>Based on proposed notes in the January snapshot. A shared source does not imply agreement or influence.</footer></main></html>').encode()
             self.send_response(code)
             self.send_header("Content-Type", "text/html; charset=utf-8")

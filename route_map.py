@@ -14,6 +14,7 @@ from zipfile import ZipFile
 
 from research.pilot import END, START, URL, page
 from domains import page_site
+from topic_search import index_topics
 
 
 @dataclass(frozen=True)
@@ -62,6 +63,7 @@ def build(db, archives):
             db.execute("INSERT OR IGNORE INTO note_text VALUES(?,?)", (c.note, c.summary))
             db.execute("INSERT OR IGNORE INTO citations VALUES(?,?,?,?,?)",
                        (c.post, c.key, c.note, c.raw, c.millis))
+        index_topics(db)
 
 
 class CitationNetwork:

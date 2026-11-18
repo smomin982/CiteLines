@@ -1,5 +1,7 @@
 # Community Notes Route Map
 
+**Search by topic:** Choose **Search by topic**, enter a word or an exact phrase (for example `gambling`), and open a cited page. Select two posts from the matching excerpts to try a route, a closure, or connection history. Counts describe matching posts only; routing uses the full graph at your cutoff. New ingestions build the SQLite FTS5 index automatically. For an existing database with note text, run `py -3 topic_search.py january.sqlite` once. Databases without note text need a fresh ingestion.
+
 **Explore by source:** Start with a domain such as `bbc.co.uk` or paste a full article URL. Browse exact pages ranked by distinct citing posts, select two posts, and compare their route, connection history, or page/site closures. The comparison shows the original, page-removed and site-removed routes together.
 
 On an article's page, read the proposed note excerpts, click **Start with this post**, then choose **Compare page vs. site**, **View route**, or **See connection history** under another post. Your first choice stays selected across pages. New databases built with `route_map.py ingest` include the original note text; existing databases still work, but display an unavailable-text label until rebuilt under a new filename.

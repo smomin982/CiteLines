@@ -58,3 +58,8 @@
 
 - **Request:** Continue implementing the source-first explorer.
 - **Kept:** Store original summaries locally once per note, attach excerpts to dated witnesses, and select posts directly from their note cards. Older databases remain readable. Showing contributor wording avoids inventing a description of an unavailable original post.
+
+### 2026-11-18 — Topic-first exploration
+
+- **Request:** Implement indexed word/phrase search, matching-post counts and a path from topic discovery into existing experiments.
+- **Decisions:** Use SQLite FTS5 with literal phrase matching; remove URL strings before indexing. Join citations by note ID so unrelated notes on the same post cannot contribute pages. Keep work offline, support indexing an existing text-enabled database and use one local server.
