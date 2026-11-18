@@ -1,0 +1,29 @@
+{
+  "trials": 1576,
+  "distinct_pair_site_tests": 1052,
+  "outcomes": {
+    "lost": 995,
+    "same_length": 536,
+    "longer": 45
+  },
+  "examples": {
+    "lost": {
+      "a": "1881948311512608793",
+      "b": "1881974309570379974",
+      "page": "https://business.x.com/en/help/ads-policies/ads-content-policies/gambling-content",
+      "original": 1
+    },
+    "same_length": {
+      "a": "1874630607835398643",
+      "b": "1875145167633887358",
+      "page": "https://www.iicsa.org.uk/reports-recommendations/publications/inquiry/final-report.html",
+      "original": 2
+    },
+    "longer": {
+      "a": "1883567313196310981",
+      "b": "1884359390498537853",
+      "page": "https://communitynotes.x.com/guide/en/contributing/examples",
+      "original": 4
+    }
+  }
+}

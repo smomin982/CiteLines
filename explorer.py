@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from route_map import Citation, CitationNetwork
 from views import STYLE, findings, render_view
+from source_view import source_view
 
 ROOT = Path(__file__).resolve().parent
 CASES = json.loads((ROOT / "research/january.json").read_text(encoding="utf-8"))["cases"]
@@ -36,7 +37,19 @@ def post_id(value):
 
 def render(params, snapshot):
     if params.get("mode") == "findings":
-        return findings(json.loads((ROOT / "research/study/summary.json").read_text(encoding="utf-8")))
+        return findings(*(json.loads((ROOT / "research/study" / f).read_text(encoding="utf-8"))
+                          for f in ("summary.json","site_summary.json")))
+    if params.get("mode") in {"sources", "source_pair"}:
+        day = date.fromisoformat(params.get("day","2025-01-31"))
+        if not date(2025,1,1) <= day <= date(2025,1,31):
+            raise ValueError("Select a day in January 2025.")
+        graph = snapshot(day)
+        if params["mode"] == "sources":
+            return source_view(graph, params, day)
+        a,b = (post_id(params.get(k,"")) for k in ("a","b"))
+        if a == b or any((p,params.get("page")) not in graph.evidence for p in (a,b)):
+            raise ValueError("Select two different posts that cite this page by the chosen date.")
+        params = dict(params, mode=params.get("action","compare"))
     return render_view(params, snapshot, CASES, post_id)
 
 
@@ -66,7 +79,7 @@ def main():
                     '<main><header><small>CiteLines / January 2025</small><h1>What connects two posts on X?</h1>'
                     '<p>People write <b>Community Notes</b> to add context to posts on X. When notes on two posts link to the same page, '
                     'CiteLines draws a connection. Follow one below, then see what happens without that source.</p>'
-                    '<nav><a href="/">Explore a route</a> · <a href="?mode=findings">What we found</a></nav></header>'
+                    '<nav><a href="/">Explore a route</a> · <a href="?mode=sources">Explore by source</a> · <a href="?mode=findings">What we found</a></nav></header>'
                     + body + '<footer>Based on proposed notes in the January snapshot. A shared source does not imply agreement or influence.</footer></main></html>').encode()
             self.send_response(code)
             self.send_header("Content-Type", "text/html; charset=utf-8")

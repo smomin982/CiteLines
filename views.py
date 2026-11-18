@@ -38,7 +38,7 @@ def trial_id(page):
     return "trial-" + sha256(page.encode()).hexdigest()[:16]
 
 
-def findings(summary):
+def findings(summary, site_summary=None):
     n, trials = summary["pairs"], summary["trials"]
     fragile = summary["fragile_pairs"]
     body = ['<section class="story"><small>January 2025 · Closure study</small>'
@@ -59,6 +59,19 @@ def findings(summary):
             query = urlencode(dict(mode="stress", a=ex["a"], b=ex["b"], day="2025-01-31"))
             body.append(f' <a href="?{escape(query)}#{trial_id(ex["closed"])}">Inspect a real case →</a>')
         body.append("</p></article>")
+    if site_summary:
+        total = site_summary["trials"]
+        body.append(f'<h3>Did the surviving backups need the same website?</h3><p>We retested only the {total:,} '
+                    'page removals that left a backup. This time we removed every cited page on the same site.</p>')
+        for kind,label in (("lost","No backup survived"),("longer","A longer backup survived"),
+                           ("same_length","A backup of the same length survived")):
+            count = site_summary["outcomes"].get(kind,0)
+            body.append(f'<p><b>{count:,} ({count/total:.1%})</b> · {label}. ')
+            if ex := site_summary["examples"].get(kind):
+                body.append(link("Compare the three routes →",mode="compare",a=ex["a"],b=ex["b"],page=ex["page"]))
+            body.append('</p>')
+        body.append('<small>Lengths here are relative to the page-only backup, not the original route. '
+                    'These are removal trials, not distinct pairs or sites.</small>')
     body.append('<details><summary>How to interpret these percentages</summary><p>Pairs were sampled '
                 'uniformly without replacement from connected pairs, not from all X posts. Longer routes '
                 'contribute more removal trials. Tied shortest routes use sorted neighbor order. Results '
@@ -112,6 +125,9 @@ def render_view(params, snapshot, cases, parse_id):
         if not path or len(path) < 3:
             body += '<p>No shared page to test for this pair at the selected cutoff.</p>'
         else:
+            selected = params.get("page")
+            if selected and a != b and (a,selected) in g.evidence and (b,selected) in g.evidence:
+                path = [a,selected,b]
             pages = path[1::2]
             key = params.get("page", pages[0])
             if key not in pages:
@@ -120,12 +136,18 @@ def render_view(params, snapshot, cases, parse_id):
             page_backup = g.route(a, b, key)
             site_backup = g.route(a, b, closed_site=domain)
             body += f'<p>Original route: <b>{len(path)//2} shared page(s)</b>. Testing <b>{escape(title(key))}</b>.</p>'
-            for label, backup in ((f"Remove one page on {domain}", page_backup),
+            for label, backup in (("Original connection", path),(f"Remove one page on {domain}", page_backup),
                                   (f"Remove all cited pages on {domain}", site_backup)):
                 outcome = f"Connected via {len(backup)//2} shared page(s)" if backup else "Disconnected"
                 body += f'<article class="outcome"><small>{escape(label)}</small><h3>{outcome}</h3>'
+                body += f'<div class="strip"><b>Post …{escape(a[-6:])}</b> → '
                 if backup:
-                    body += '<details><summary>Inspect this surviving route</summary>'+chain(g, backup)+'</details>'
+                    body += ' → '.join(f'<span class="chip">{escape(title(p))}</span>' for p in backup[1::2])
+                else:
+                    body += '<em>No connecting pages</em>'
+                body += f' → <b>Post …{escape(b[-6:])}</b></div>'
+                if backup:
+                    body += '<details><summary>Inspect route evidence</summary>'+chain(g, backup)+'</details>'
                 body += '</article>'
             if page_backup and not site_backup:
                 body += f'<p><b>The backup still depends on {escape(domain)}.</b> Removing one page left a way around it, but every surviving chain used at least one page on that site.</p>'
@@ -217,6 +239,7 @@ def render_view(params, snapshot, cases, parse_id):
 
 
 STYLE = """
+.strip{display:flex;align-items:center;flex-wrap:wrap;gap:.4em;font-size:.88em}.chip{border:1px solid #91afa1;border-radius:.5em;padding:.2em .5em;background:white;overflow-wrap:anywhere;max-width:100%}
 :root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f4f2eb;color:#183733;font:17px/1.55 system-ui,sans-serif}
 main{max-width:860px;margin:auto;padding:24px clamp(14px,4vw,40px) 60px}header{padding:18px 0 24px}h1{font:700 clamp(32px,5vw,48px)/1.1 Georgia,serif;margin:12px 0}
 h2{font:700 clamp(27px,4vw,38px)/1.15 Georgia,serif;margin:.3em 0}p{max-width:68ch}header p{margin:.6em 0 0}

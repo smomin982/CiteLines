@@ -18,7 +18,15 @@ Route from the lower string ID using BFS with sorted neighbors. Close each page 
 
 These estimates describe connected pairs under one month's citation and URL rules. They do not measure all X posts, source credibility, or independent evidence.
 
-## Benchmark
+## Follow-up: remove the whole site
+
+Among the **1,576** page-removal trials with a surviving backup, **995 (63.1%)** disconnected when all pages on that registrable domain were excluded instead. A further **45 (2.9%)** required a longer backup; **536 (34.0%)** retained a backup of the same length. The reference distance is the page-only backup distance. These are matched trials on the same January network, not a new sample.
+
+The 1,576 rows correspond to 1,052 distinct `(post pair, site)` queries: several pages on one route can belong to the same site. Moreover, `x.com` accounted for **824 of the 995** lost backups. This finding is about the sampled routes, not a typical website. Only cited page nodes were excluded; both X post endpoints remained in the graph.
+
+Run `py -3 -m research.site_study january.sqlite` to regenerate the [matched rows](site_closures.csv) and [site summary](site_summary.json) from `closures.csv`. The app links to a sampled example of each outcome.
+
+## Representation benchmark
 
 The full bipartite graph stored **140,319 post–page edges**. The post-only projection required **9,820,538 post–post edges** (about **70×** as many), plus the pages supporting each pair. Construction took **0.42 seconds vs. 17.64 seconds** in one local run. The evidence is strongest for construction cost and edge count, not a universal query speedup.
 

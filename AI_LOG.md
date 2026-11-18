@@ -48,3 +48,8 @@
 
 - **Request:** Proceed with the proposed site-dependence feature after the history commit.
 - **Decision:** Compare two independent closures at the same cutoff using the bundled public suffix rules, rather than treating a hostname or publisher name as a site. Verified a sampled pair where a six-page backup survives removal of the specific page but no backup survives removal of its domain.
+
+### 2026-11-18 — Explore by source and measure site dependence
+
+- **Request:** Build a source-first entry point, run the matched site study, and show three compact route states.
+- **Decisions:** Count distinct posts, not notes. Preserve the visitor's selected shared page for closure comparisons, even when another URL wins a shortest-path tie. Reuse all surviving trial rows and cache identical pair/site queries without collapsing their statistical weights. Report the concentration of lost backups on `x.com` alongside the overall rate.
