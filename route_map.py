@@ -15,6 +15,7 @@ from zipfile import ZipFile
 from research.pilot import END, START, URL, page
 from domains import page_site
 from topic_search import index_topics
+from english_posts import collection, scope
 
 
 @dataclass(frozen=True)
@@ -195,6 +196,7 @@ def main():
             if dt.tzinfo is None:
                 parser.error("--cutoff must include a timezone")
             cutoff = int(dt.astimezone(timezone.utc).timestamp() * 1000)
+        scope(db,collection())
         records = db.execute("SELECT post,page,note,raw,millis FROM citations WHERE millis<=?", (cutoff,))
         graph = CitationNetwork((Citation(*r) for r in records), cutoff)
         path = graph.route(args.start, args.end, args.close)

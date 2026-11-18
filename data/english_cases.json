@@ -1,0 +1,10 @@
+{
+  "space": {
+    "heading": "Two posts about SpaceX funding",
+    "before": ["1880029118080942296", "https://www.nasa.gov/news-release/as-artemis-moves-forward-nasa-picks-spacex-to-land-next-americans-on-moon/", "1880032372437184730"]
+  },
+  "fires": {
+    "heading": "Two posts about the Los Angeles wildfires",
+    "before": ["1877735985124872583", "https://www.newsweek.com/diddy-sean-combs-home-los-angeles-wildfires-2013365", "1878576661261918348"]
+  }
+}

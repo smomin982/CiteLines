@@ -16,10 +16,12 @@ class EmbedText(HTMLParser):
         self.inside = False
         self.parts = []
         self.date = ""
+        self.language = ""
 
     def handle_starttag(self, tag, attrs):
         if tag == "p":
             self.inside = True
+            self.language = (dict(attrs).get("lang") or "").lower()
         elif tag == "br" and self.inside:
             self.parts.append("\n")
 
@@ -44,7 +46,7 @@ def fetch_preview(post, cache_interval):
     text = "".join(parser.parts).strip()
     if not text:
         raise ValueError("No public text")
-    return dict(author=doc["author_name"], text=text, date=parser.date)
+    return dict(author=doc["author_name"], text=text, date=parser.date, language=parser.language)
 
 
 def preview(post):

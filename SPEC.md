@@ -4,6 +4,8 @@ Given two decimal X post IDs, an inclusive cutoff instant and optionally one exc
 
 ## Data contract
 
+The interactive graph, CLI and searches filter the archive to original IDs with oEmbed paragraph `lang=en` (or an `en-` regional variant) recorded in `data/english_posts.json`. Verification samples shared-source neighborhoods (`english_posts.py`); it does not infer original language from contributor wording. Unknowns are excluded. The earlier closure study still runs on the unfiltered archive and its aggregates are explicitly labeled.
+
 Read the five Notes TSV archives from X's November 17, 2026 snapshot ([source and reproduction instructions](research/README.md)). Select `2025-01-01 ≤ createdAtMillis < 2025-02-01`, interpreted as UTC dates. Keep `tweetId` and `noteId` as decimal strings; extract explicit HTTP(S) URLs from `summary`. The pilot's frozen normalizer lowercases hosts, drops fragments and `utm_` parameters, retains paths and other query parameters, and flags common shorteners for exclusion. It does not fetch target pages. The network cannot infer missing links or restore deleted notes. SQLite retains distinct citations; repeated notes citing the same page on the same post create only one graph edge.
 
 ## Routing rules

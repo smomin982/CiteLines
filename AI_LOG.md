@@ -63,4 +63,5 @@
 
 - **Request:** Implement indexed word/phrase search, matching-post counts and a path from topic discovery into existing experiments.
 - **Follow-up:** Added live original-post previews after the user reported that note excerpts alone made the interface hard to understand. Verified oEmbed availability for both guided pairs and separated the author’s text, contributor note, and shared source in the walkthrough.
+- **Language scope:** At the student's request, limited visitor-facing post discovery and routing to verified English originals. Used X's language tag, changed the guided examples, and preserved the original research denominators separately.
 - **Decisions:** Use SQLite FTS5 with literal phrase matching; remove URL strings before indexing. Join citations by note ID so unrelated notes on the same post cannot contribute pages. Keep work offline, support indexing an existing text-enabled database and use one local server.

@@ -16,15 +16,17 @@ from source_view import source_view
 from topic_view import topic_view
 from contextlib import closing
 from post_preview import SCRIPT, preview
+from english_posts import collection, english, scope
 
 ROOT = Path(__file__).resolve().parent
-CASES = json.loads((ROOT / "research/january.json").read_text(encoding="utf-8"))["cases"]
-BASE = CASES["detour"]["before"]
+CASES = json.loads((ROOT / "data/english_cases.json").read_text(encoding="utf-8"))
 
 
-def load_network(db, day):
+def load_network(db, day, english_ids=None):
     cutoff = int(datetime.combine(day, datetime.max.time(), timezone.utc).timestamp() * 1000)
     with sqlite3.connect(db.as_uri() + "?mode=ro", uri=True) as conn:
+        if english_ids is not None:
+            scope(conn,english_ids)
         enriched = conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='note_text'").fetchone()
         extra = ",summary" if enriched else ""
         join = " LEFT JOIN note_text USING(note)" if enriched else ""
@@ -43,8 +45,12 @@ def post_id(value):
 
 def render(params, snapshot):
     if params.get("mode") == "findings":
-        return findings(*(json.loads((ROOT / "research/study" / f).read_text(encoding="utf-8"))
-                          for f in ("summary.json","site_summary.json")))
+        summaries = [json.loads((ROOT / "research/study" / f).read_text(encoding="utf-8"))
+                     for f in ("summary.json","site_summary.json")]
+        for summary in summaries:
+            summary["examples"] = {}
+        return ('<aside><b>Archived study: all languages.</b> These figures describe the full January '
+                'network, not the verified English subset you can explore.</aside>'+findings(*summaries))
     if params.get("mode") in {"sources", "source_pair"}:
         day = date.fromisoformat(params.get("day","2025-01-31"))
         if not date(2025,1,1) <= day <= date(2025,1,31):
@@ -67,7 +73,8 @@ def main():
     db = args.database.resolve()
     if not db.is_file():
         cli.error("Database not found. Build it with route_map.py ingest first.")
-    snapshot = lru_cache(maxsize=1)(lambda day: load_network(db, day))
+    english_ids = collection()
+    snapshot = lru_cache(maxsize=1)(lambda day: load_network(db, day, english_ids))
 
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -77,8 +84,14 @@ def main():
                 if not re.fullmatch(r"[0-9]{1,20}", post):
                     self.send_error(400)
                     return
+                if post not in english_ids:
+                    self.send_error(404,"Not a verified English post")
+                    return
                 try:
-                    payload = json.dumps(preview(post)).encode()
+                    item = preview(post)
+                    if not english(item["language"]):
+                        raise ValueError("No English preview")
+                    payload = json.dumps(item).encode()
                 except (OSError, ValueError, KeyError):
                     self.send_error(503, "Original post unavailable")
                     return
@@ -94,8 +107,12 @@ def main():
                 return
             try:
                 params = {k:v[-1] for k,v in parse_qs(url.query).items()}
+                for k in ("a","b","first"):
+                    if params.get(k) and post_id(params[k]) not in english_ids:
+                        raise ValueError("That post is outside the verified English collection.")
                 if params.get("mode") == "topics":
                     with closing(sqlite3.connect(db.as_uri()+"?mode=ro",uri=True)) as conn:
+                        scope(conn,english_ids)
                         body = topic_view(conn,params)
                 else:
                     body = render(params, snapshot)
@@ -104,7 +121,7 @@ def main():
                 body, code = f'<p>{escape(str(exc))}</p><a href="/">Reset explorer</a>', 400
             html = (f'<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" '
                     f'content="width=device-width,initial-scale=1"><title>CiteLines</title><style>{STYLE}</style>'
-                    '<main><header class="mast"><a class="brand" href="/">CiteLines</a>'
+                    '<main><header class="mast"><a class="brand" href="/">CiteLines</a><small>English posts only</small>'
                     '<nav aria-label="Main"><a href="/">Walkthrough</a><a href="?mode=topics">Topics</a>'
                     '<a href="?mode=sources">Sources</a><a href="?mode=findings">Findings</a></nav></header>'
                     + body + '<footer>January 2025 Community Notes · Public post previews from X. '

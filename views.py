@@ -112,7 +112,7 @@ def chain(g, path):
 
 
 def render_view(params, snapshot, cases, parse_id):
-    base = cases["detour"]["before"]
+    base = next(iter(cases.values()))["before"]
     a = parse_id(params.get("a", base[0]))
     mode = params.get("mode", "route")
     b = parse_id(params.get("b") or base[-1]) if mode != "nearby" else base[-1]
@@ -211,10 +211,8 @@ def render_view(params, snapshot, cases, parse_id):
                 body += "<p>Showing the first 25 destinations.</p>"
     else:
         path = g.route(a, b)
-        heading, intro = {
-            "detour": ("Two posts, one Wikipedia article", "One note discusses parties voting together in Germany. Another discusses majority decisions. Both cite the same German Wikipedia article: <em>Demokratie</em>."),
-            "disconnected": ("Two notes identify the same sultan", "On two different posts, contributors identified a pictured person as Said bin Sultan. Both pointed readers to the same Arabic Wikipedia biography."),
-        }.get(example, ("How are these posts connected?", "Follow the chain below. Each shared page is cited in notes on the posts immediately above and below it."))
+        heading = escape(cases[example]["heading"]) if example else "How are these posts connected?"
+        intro = "Notes on both English-language posts cite this page."
         body = f'<small>{"Guided example" if example else "Your search"} · through {day:%d %B %Y}</small><h1>{heading}</h1>'
         body += ('<p>Community Notes are written by contributors to add context to posts on X. '
                  'CiteLines shows how those notes connect different posts by citing the same sources.</p>')
@@ -255,12 +253,8 @@ def render_view(params, snapshot, cases, parse_id):
             body += '<p>'+link("Compare removing one page vs. its whole site →", mode="compare", **common)+'</p>'
         body += '<p>'+link("When did these posts first connect? →", mode="history", **common)+'</p>'
         body += '<p>'+link("Explore other posts connected to the starting post →", mode="nearby", **common)+'</p>'
-    demos = " &nbsp;·&nbsp; ".join(link(label, a=c["before"][0], b=c["before"][-1])
-                                   for label,c in (("German voting debate",cases["detour"]),("A sultan’s portrait",cases["disconnected"])))
-    demos += " &nbsp;·&nbsp; " + link("A shortcut that appeared later", mode="history",
-                                      a="1876209456205398444", b="1879258365798539578")
-    demos += " &nbsp;·&nbsp; " + link("A backup that still needs the same site", mode="compare",
-                                      a="1881948311512608793", b="1881974309570379974")
+    demos = " &nbsp;·&nbsp; ".join(link(c["heading"], a=c["before"][0], b=c["before"][-1])
+                                   for c in cases.values())
     return '<section class="story">'+body+'</section><aside><b>Try a case:</b> '+demos+'</aside>'+controls
 
 
