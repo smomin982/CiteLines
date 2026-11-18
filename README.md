@@ -1,5 +1,7 @@
 # Community Notes Route Map
 
+**Start with the posts:** The walkthrough shows the two original X posts side by side, their shared citation, then a page-removal experiment. Text previews use X's public oEmbed service and include the reported author and date. Open the permalink for media or the live thread. Other result lists load previews on demand. A blocked or unavailable post does not prevent exploring locally archived notes.
+
 **Search by topic:** Choose **Search by topic**, enter a word or an exact phrase (for example `gambling`), and open a cited page. Select two posts from the matching excerpts to try a route, a closure, or connection history. Counts describe matching posts only; routing uses the full graph at your cutoff. New ingestions build the SQLite FTS5 index automatically. For an existing database with note text, run `py -3 topic_search.py january.sqlite` once. Databases without note text need a fresh ingestion.
 
 **Explore by source:** Start with a domain such as `bbc.co.uk` or paste a full article URL. Browse exact pages ranked by distinct citing posts, select two posts, and compare their route, connection history, or page/site closures. The comparison shows the original, page-removed and site-removed routes together.

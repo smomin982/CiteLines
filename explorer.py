@@ -6,7 +6,7 @@ import sqlite3
 from datetime import date, datetime, timezone
 from functools import lru_cache
 from html import escape
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
@@ -15,6 +15,7 @@ from views import STYLE, findings, render_view
 from source_view import source_view
 from topic_view import topic_view
 from contextlib import closing
+from post_preview import SCRIPT, preview
 
 ROOT = Path(__file__).resolve().parent
 CASES = json.loads((ROOT / "research/january.json").read_text(encoding="utf-8"))["cases"]
@@ -71,6 +72,23 @@ def main():
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
             url = urlsplit(self.path)
+            if url.path == "/post-preview":
+                post = parse_qs(url.query).get("id",[""])[0]
+                if not re.fullmatch(r"[0-9]{1,20}", post):
+                    self.send_error(400)
+                    return
+                try:
+                    payload = json.dumps(preview(post)).encode()
+                except (OSError, ValueError, KeyError):
+                    self.send_error(503, "Original post unavailable")
+                    return
+                self.send_response(200)
+                self.send_header("Content-Type","application/json")
+                self.send_header("Cache-Control","private, max-age=300")
+                self.send_header("Content-Length",str(len(payload)))
+                self.end_headers()
+                self.wfile.write(payload)
+                return
             if url.path != "/":
                 self.send_error(404)
                 return
@@ -86,18 +104,18 @@ def main():
                 body, code = f'<p>{escape(str(exc))}</p><a href="/">Reset explorer</a>', 400
             html = (f'<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" '
                     f'content="width=device-width,initial-scale=1"><title>CiteLines</title><style>{STYLE}</style>'
-                    '<main><header><small>CiteLines / January 2025</small><h1>What connects two posts on X?</h1>'
-                    '<p>People write <b>Community Notes</b> to add context to posts on X. When notes on two posts link to the same page, '
-                    'CiteLines draws a connection. Follow one below, then see what happens without that source.</p>'
-                    '<nav><a href="?mode=topics">Search by topic</a> · <a href="/">Explore a route</a> · <a href="?mode=sources">Explore by source</a> · <a href="?mode=findings">What we found</a></nav></header>'
-                    + body + '<footer>Based on proposed notes in the January snapshot. A shared source does not imply agreement or influence.</footer></main></html>').encode()
+                    '<main><header class="mast"><a class="brand" href="/">CiteLines</a>'
+                    '<nav aria-label="Main"><a href="/">Walkthrough</a><a href="?mode=topics">Topics</a>'
+                    '<a href="?mode=sources">Sources</a><a href="?mode=findings">Findings</a></nav></header>'
+                    + body + '<footer>January 2025 Community Notes · Public post previews from X. '
+                    'Shared citations do not establish agreement or influence.</footer></main>'+SCRIPT+'</html>').encode()
             self.send_response(code)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(html)))
             self.end_headers()
             self.wfile.write(html)
 
-    with HTTPServer(("127.0.0.1", args.port), Handler) as server:
+    with ThreadingHTTPServer(("127.0.0.1", args.port), Handler) as server:
         print(f"Open http://127.0.0.1:{args.port}/ (Ctrl+C to stop)", flush=True)
         server.serve_forever()
 

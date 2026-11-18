@@ -62,4 +62,5 @@
 ### 2026-11-18 — Topic-first exploration
 
 - **Request:** Implement indexed word/phrase search, matching-post counts and a path from topic discovery into existing experiments.
+- **Follow-up:** Added live original-post previews after the user reported that note excerpts alone made the interface hard to understand. Verified oEmbed availability for both guided pairs and separated the author’s text, contributor note, and shared source in the walkthrough.
 - **Decisions:** Use SQLite FTS5 with literal phrase matching; remove URL strings before indexing. Join citations by note ID so unrelated notes on the same post cannot contribute pages. Keep work offline, support indexing an existing text-enabled database and use one local server.

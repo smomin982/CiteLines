@@ -4,6 +4,7 @@ from hashlib import sha256
 from html import escape
 from urllib.parse import unquote, urlencode, urlsplit
 from domains import page_site
+from post_preview import card
 
 
 CAPTIONS = {
@@ -98,7 +99,7 @@ def chain(g, path):
             role = "Starting post" if i == 0 else "Destination post" if i == len(path)-1 else "Connecting post"
             caption = CAPTIONS.get(item, "Post on X")
             nodes.append(f'<li class="post"><small>{role}</small><b>{escape(caption)}</b>'
-                         f'<a href="https://x.com/i/web/status/{escape(item)}" target="_blank" rel="noreferrer">View post on X ↗</a></li>')
+                         +card(item)+'</li>')
         else:
             cites = [g.evidence[p, item] for p in (path[i-1], path[i+1])]
             proof = "".join(f"<li>Post {escape(c.post)} · note {escape(c.note)} · "
@@ -214,13 +215,29 @@ def render_view(params, snapshot, cases, parse_id):
             "detour": ("Two posts, one Wikipedia article", "One note discusses parties voting together in Germany. Another discusses majority decisions. Both cite the same German Wikipedia article: <em>Demokratie</em>."),
             "disconnected": ("Two notes identify the same sultan", "On two different posts, contributors identified a pictured person as Said bin Sultan. Both pointed readers to the same Arabic Wikipedia biography."),
         }.get(example, ("How are these posts connected?", "Follow the chain below. Each shared page is cited in notes on the posts immediately above and below it."))
-        body = f'<small>{"Guided example" if example else "Your search"} · through {day:%d %B %Y}</small><h2>{heading}</h2><p>{intro}</p>'
-        body += chain(g, path)
+        body = f'<small>{"Guided example" if example else "Your search"} · through {day:%d %B %Y}</small><h1>{heading}</h1>'
+        body += ('<p>Community Notes are written by contributors to add context to posts on X. '
+                 'CiteLines shows how those notes connect different posts by citing the same sources.</p>')
+        body += '<h3>1. Read the original posts</h3><div class="postpair">'+card(a,auto=True,label="Original post · A")
+        if a != b:
+            body += card(b,auto=True,label="Original post · B")
+        body += '</div><h3>2. See what the notes connect</h3>'
+        if path and len(path)==3:
+            key = path[1]
+            body += (f'<div class="shared"><small>Shared source</small><h3><a href="{escape(key)}" '
+                     f'target="_blank" rel="noreferrer">{escape(title(key))}</a></h3><p>{intro}</p>'
+                     '<details><summary>Read the two proposed Community Notes</summary>')
+            for label,p in (("A",a),("B",b)):
+                body += f'<small>Contributor note on post {label}</small>'+note_excerpt(g.evidence[p,key])
+            body += '</details></div>'
+        else:
+            body += chain(g, path)
         if path and len(path) > 1 and mode != "stress":
+            body += '<h3>3. Does the connection survive?</h3>'
             text = "Remove that page and see what happens →" if len(path)==3 else "Try removing each shared page →"
             body += '<div class="action">'+link(text, mode="stress", **common)+'</div>'
         elif mode == "stress" and path:
-            body += '<h3 id="outcomes">What changed?</h3>'
+            body += '<h3 id="outcomes">3. What changed when the source was removed?</h3>'
             if len(path) == 1:
                 body += '<p>You selected the same post twice. There is no shared page to remove.</p>'
             for key, backup, delta in g.closures(path):
@@ -262,4 +279,10 @@ small{color:#496359}.story>small,header small,.chain>li>small,.outcome>small{fon
 a{color:#175d50;text-underline-offset:.18em}summary,button{cursor:pointer}.outcome{padding:18px;background:#f1f6ed;border-left:4px solid #35755f;margin:16px 0}
 .outcome h3{margin:.35em 0}.result{padding:10px 0;border-top:1px solid #dae0d8}form{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 label,input{display:block}input{max-width:100%;padding:8px}li,.result,p{overflow-wrap:anywhere}footer{font-size:.85em;color:#4e635a;margin:20px 0}
+.mast,.mast nav{display:flex;align-items:center;flex-wrap:wrap;gap:1em}.mast{justify-content:space-between;border-bottom:1px solid #c7d4ca;margin-bottom:1.2em}.mast nav a{text-decoration:none;padding:5px 2px}.mast nav a:hover{text-decoration:underline}.brand{font:700 2rem Georgia,serif;text-decoration:none;color:#173e34}
+.postpair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,255px),1fr));gap:12px}
+.xcard,.shared{padding:15px;background:#f7f9f7;border:1px solid #d4dfd8;border-radius:10px;min-width:0;overflow-wrap:anywhere}
+.xcard small,.shared>small{color:#4d655e}.xcontent p{white-space:pre-line;font-size:.95em;line-height:1.5;max-height:18em;overflow:auto;margin:.55em 0}.xcontent strong{display:block;margin:.45em 0}
+.xcard>a,.xload{font-size:.8em}.xload{padding:.3em .65em}.xcontent:empty{display:none}.shared h3{margin:.35em 0}.story>h3{margin:1.4em 0 .6em}
+.xload[hidden]{display:none}.xcontent small{display:block;margin-bottom:.4em}
 """

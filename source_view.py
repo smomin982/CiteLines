@@ -5,6 +5,7 @@ from urllib.parse import urlsplit
 from domains import page_site
 from research.pilot import page
 from views import CAPTIONS, link, note_excerpt, title
+from post_preview import card
 
 
 def source_view(graph, params, day):
@@ -39,12 +40,12 @@ def source_view(graph, params, day):
                 raise ValueError("The starting post does not cite this page by that date.")
             base["first"] = first
             body.append(f'<article class="outcome"><small>Selected first post</small>'
-                        f'{note_excerpt(graph.evidence[first,key])}'+
+                        +card(first,auto=True)+note_excerpt(graph.evidence[first,key])+
                         link("Choose a different starting post",mode="sources",day=str(day),q=q,offset=offset)+'</article>')
         for p in posts[offset:offset+20]:
             c = graph.evidence[p,key]
             body.append('<div class="result">'+link(CAPTIONS.get(p, "Post "+p),mode="nearby",a=p,day=str(day))+
-                        f'<br><small>Proposed note {escape(c.note)}</small>'+note_excerpt(c))
+                        card(p)+f'<small>Proposed note {escape(c.note)}</small>'+note_excerpt(c))
             if not first and len(posts) >= 2:
                 body.append(link("Start with this post",q=q,offset=offset,first=p,**base))
             elif first and first != p:
