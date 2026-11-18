@@ -11,7 +11,8 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 from route_map import Citation, CitationNetwork
-from views import STYLE, findings, render_view
+from views import findings, render_view
+from layout import frame
 from source_view import source_view
 from topic_view import topic_view
 from contextlib import closing
@@ -119,13 +120,7 @@ def main():
                 code = 200
             except ValueError as exc:
                 body, code = f'<p>{escape(str(exc))}</p><a href="/">Reset explorer</a>', 400
-            html = (f'<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" '
-                    f'content="width=device-width,initial-scale=1"><title>CiteLines</title><style>{STYLE}</style>'
-                    '<main><header class="mast"><a class="brand" href="/">CiteLines</a><small>English posts only</small>'
-                    '<nav aria-label="Main"><a href="/">Walkthrough</a><a href="?mode=topics">Topics</a>'
-                    '<a href="?mode=sources">Sources</a><a href="?mode=findings">Findings</a></nav></header>'
-                    + body + '<footer>January 2025 Community Notes · Public post previews from X. '
-                    'Shared citations do not establish agreement or influence.</footer></main>'+SCRIPT+'</html>').encode()
+            html = frame(body,params.get("mode","route"),SCRIPT,len(english_ids)).encode()
             self.send_response(code)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(html)))

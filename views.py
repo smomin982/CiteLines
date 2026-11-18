@@ -5,6 +5,7 @@ from html import escape
 from urllib.parse import unquote, urlencode, urlsplit
 from domains import page_site
 from post_preview import card
+from layout import case_header, step
 
 
 CAPTIONS = {
@@ -55,6 +56,7 @@ def findings(summary, site_summary=None):
                         ("disconnected","No route survived")):
         count = summary["outcomes"].get(kind, 0)
         body.append(f'<article class="result"><b>{count/trials:.1%} · {label}</b>'
+                    f'<div class="gauge {kind}" aria-hidden="true"><i style="width:{100*count/trials:.2f}%"></i></div>'
                     f'<p>{count:,} of {trials:,} page removals.')
         if ex := summary["examples"].get(kind):
             query = urlencode(dict(mode="stress", a=ex["a"], b=ex["b"], day="2025-01-31"))
@@ -213,13 +215,11 @@ def render_view(params, snapshot, cases, parse_id):
         path = g.route(a, b)
         heading = escape(cases[example]["heading"]) if example else "How are these posts connected?"
         intro = "Notes on both English-language posts cite this page."
-        body = f'<small>{"Guided example" if example else "Your search"} · through {day:%d %B %Y}</small><h1>{heading}</h1>'
-        body += ('<p>Community Notes are written by contributors to add context to posts on X. '
-                 'CiteLines shows how those notes connect different posts by citing the same sources.</p>')
-        body += '<h3>1. Read the original posts</h3><div class="postpair">'+card(a,auto=True,label="Original post · A")
+        body = case_header(heading,example,day,path)
+        body += step(1,"Read the original posts","posts")+'<div class="postpair">'+card(a,auto=True,label="Original post · A")
         if a != b:
             body += card(b,auto=True,label="Original post · B")
-        body += '</div><h3>2. See what the notes connect</h3>'
+        body += '</div>'+step(2,"Follow the shared evidence","source")
         if path and len(path)==3:
             key = path[1]
             body += (f'<div class="shared"><small>Shared source</small><h3><a href="{escape(key)}" '
@@ -231,11 +231,11 @@ def render_view(params, snapshot, cases, parse_id):
         else:
             body += chain(g, path)
         if path and len(path) > 1 and mode != "stress":
-            body += '<h3>3. Does the connection survive?</h3>'
+            body += step(3,"Test the connection","experiment")
             text = "Remove that page and see what happens →" if len(path)==3 else "Try removing each shared page →"
             body += '<div class="action">'+link(text, mode="stress", **common)+'</div>'
         elif mode == "stress" and path:
-            body += '<h3 id="outcomes">3. What changed when the source was removed?</h3>'
+            body += step(3,"What changed when the source was removed?","outcomes")
             if len(path) == 1:
                 body += '<p>You selected the same post twice. There is no shared page to remove.</p>'
             for key, backup, delta in g.closures(path):
@@ -249,34 +249,12 @@ def render_view(params, snapshot, cases, parse_id):
                     body += '<details open><summary>Follow the backup route</summary>'+chain(g, backup)+'</details>'
                 body += '<p>'+link("Compare with removing the whole site →", mode="compare", page=key, **common)+'</p>'
                 body += '</article>'
-        if path and len(path) > 1 and mode != "stress":
-            body += '<p>'+link("Compare removing one page vs. its whole site →", mode="compare", **common)+'</p>'
-        body += '<p>'+link("When did these posts first connect? →", mode="history", **common)+'</p>'
-        body += '<p>'+link("Explore other posts connected to the starting post →", mode="nearby", **common)+'</p>'
-    demos = " &nbsp;·&nbsp; ".join(link(c["heading"], a=c["before"][0], b=c["before"][-1])
+        tools = []
+        if path and len(path) > 1:
+            tools.append(link("Page vs. whole site →", mode="compare", **common))
+        tools += [link("Connection history →",mode="history",**common),
+                  link("Nearby posts →",mode="nearby",**common)]
+        body += '<div class="toolbox"><small>Keep exploring</small><div>'+"".join(tools)+'</div></div>'
+    demos = "".join(link(c["heading"], a=c["before"][0], b=c["before"][-1])
                                    for c in cases.values())
-    return '<section class="story">'+body+'</section><aside><b>Try a case:</b> '+demos+'</aside>'+controls
-
-
-STYLE = """
-blockquote{margin:.5em 0;padding:.4em .9em;border-inline-start:3px solid #91afa1;background:#f6f7f2;overflow-wrap:anywhere}
-.strip{display:flex;align-items:center;flex-wrap:wrap;gap:.4em;font-size:.88em}.chip{border:1px solid #91afa1;border-radius:.5em;padding:.2em .5em;background:white;overflow-wrap:anywhere;max-width:100%}
-:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f4f2eb;color:#183733;font:17px/1.55 system-ui,sans-serif}
-main{max-width:860px;margin:auto;padding:24px clamp(14px,4vw,40px) 60px}header{padding:18px 0 24px}h1{font:700 clamp(32px,5vw,48px)/1.1 Georgia,serif;margin:12px 0}
-h2{font:700 clamp(27px,4vw,38px)/1.15 Georgia,serif;margin:.3em 0}p{max-width:68ch}header p{margin:.6em 0 0}
-.story,aside,.search{background:#fff;border:1px solid #d2d9d1;border-radius:14px;padding:clamp(15px,3vw,28px);margin:12px 0}
-small{color:#496359}.story>small,header small,.chain>li>small,.outcome>small{font:bold 12px/1.5 system-ui;letter-spacing:.06em;text-transform:uppercase;display:block}
-.chain{list-style:none;padding:0 0 0 20px;margin:22px 0}.chain>li{position:relative;border-left:3px solid #91afa1;padding:0 0 18px 20px}
-.chain>li:before{content:"";position:absolute;left:-8px;top:3px;width:9px;height:9px;border:2px solid #346658;background:#fff;border-radius:50%}
-.chain>.source:before{border-radius:2px;background:#ebc16a}.chain>li:last-child{border-color:transparent}.chain b{display:block}
-.post>a,summary{font-size:.9em}.action a,button{display:inline-block;background:#18584a;color:white;border:0;border-radius:6px;padding:10px 16px;font-weight:650}
-a{color:#175d50;text-underline-offset:.18em}summary,button{cursor:pointer}.outcome{padding:18px;background:#f1f6ed;border-left:4px solid #35755f;margin:16px 0}
-.outcome h3{margin:.35em 0}.result{padding:10px 0;border-top:1px solid #dae0d8}form{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-label,input{display:block}input{max-width:100%;padding:8px}li,.result,p{overflow-wrap:anywhere}footer{font-size:.85em;color:#4e635a;margin:20px 0}
-.mast,.mast nav{display:flex;align-items:center;flex-wrap:wrap;gap:1em}.mast{justify-content:space-between;border-bottom:1px solid #c7d4ca;margin-bottom:1.2em}.mast nav a{text-decoration:none;padding:5px 2px}.mast nav a:hover{text-decoration:underline}.brand{font:700 2rem Georgia,serif;text-decoration:none;color:#173e34}
-.postpair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,255px),1fr));gap:12px}
-.xcard,.shared{padding:15px;background:#f7f9f7;border:1px solid #d4dfd8;border-radius:10px;min-width:0;overflow-wrap:anywhere}
-.xcard small,.shared>small{color:#4d655e}.xcontent p{white-space:pre-line;font-size:.95em;line-height:1.5;max-height:18em;overflow:auto;margin:.55em 0}.xcontent strong{display:block;margin:.45em 0}
-.xcard>a,.xload{font-size:.8em}.xload{padding:.3em .65em}.xcontent:empty{display:none}.shared h3{margin:.35em 0}.story>h3{margin:1.4em 0 .6em}
-.xload[hidden]{display:none}.xcontent small{display:block;margin-bottom:.4em}
-"""
+    return '<section class="story">'+body+'</section><aside class="casepicker"><small>Case library</small><div>'+demos+'</div></aside>'+controls
