@@ -1,6 +1,6 @@
 # Community Notes Route Map
 
-**SI 507 capstone proposal · Target grade: A · Topic change requested from F1 strategy**
+**SI 507 capstone proposal · Target grade: A · Approved by instructor (reported by student)**
 
 Two X posts looked one transfer apart: notes on both cited the German Wikipedia article *Demokratie*. I wanted to know whether that page was a shortcut or the only connection. In the January 2025 pilot, removing it revealed a two-transfer detour: notes on a third post cited both a *Frankfurter Rundschau* article and the Bundestag's seat-distribution page. In another case, removing a shared biography left both posts isolated.
 

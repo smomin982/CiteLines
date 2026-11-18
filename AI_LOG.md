@@ -17,3 +17,8 @@
 
 - **Request:** Proceed from the committed feasibility pilot to the topic-change proposal.
 - **Draft choices:** Used the verified German detour as the opening example and scoped delivery to January because the pilot already demonstrates both closure outcomes. Included the verified counts and qualified prior-work claim; left closure frequencies as a research question. Target grade A is proposed for student review. Instructor approval is pending.
+
+### 2026-11-17 — Approval and checkpoint
+
+- **Update:** The student reported instructor approval. The assistant implemented the planned CLI checkpoint on a new branch.
+- **Kept and checked:** Reused the pilot URL keys to preserve comparability. Added SQLite evidence storage, BFS routing, cutoff and closure tests. Checked both pilot pairs against the CLI before and after closure. Left stable tie selection and the broader empirical analysis for the final build.
