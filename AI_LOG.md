@@ -27,3 +27,8 @@
 
 - **Request:** Enhance the checkpoint app. Added a local browser interface, bounded neighborhoods and independent closure trials along a selected route.
 - **Design choice:** Use a standard-library local server rather than require Streamlit, so the same Python installation and existing SQLite database run both interfaces. Sort adjacency lists once for repeatable tie selection; keep closure trials independent so an early disconnection cannot contaminate later results.
+
+### 2026-11-17 — First-visit redesign
+
+- **Feedback:** The neighborhood screenshot exposed IDs and transfer counts without explaining what they meant.
+- **Change:** Lead with a guided example; label the two posts by what their proposed notes discuss, checked against the eight original witness summaries. For other destinations, identify the cited source instead of guessing the post's subject. Keep IDs, note dates, and raw evidence available on demand.

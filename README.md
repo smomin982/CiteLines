@@ -6,7 +6,7 @@ Trace the shortest citation chain between two X posts and close a page to see wh
 
 **Browser interface:** With the database built, run `py -3 explorer.py january.sqlite` and open **http://127.0.0.1:8765/**. On the original development machine the existing database is available at `"$env:LOCALAPPDATA\Temp\opencode\checkpoint-jan.sqlite"`. The local server uses the Python standard library. Stop it with Ctrl+C.
 
-Start with **Real detour**, expand its closure result, and inspect the note IDs and dates behind the replacement transfers. **Explore nearby** lists posts one or two transfers from your origin; select a destination to see its route. The date control uses the end of the selected UTC day. The stress test closes each page independently and reports the resulting distance change. These are pair-specific findings, not a ranking of globally important sources.
+Start with **Two posts, one Wikipedia article**. Follow the chain, then click **Remove that page and see what happens** to reveal the backup route. The sultan’s portrait case shows the opposite outcome. To discover other destinations, click **Explore other posts connected to the starting post**. The search panel accepts post IDs or URLs and an end-of-day UTC cutoff. Each page-removal trial affects just one page and one post pair.
 
 Download the five archives using the `$files` block in [research/README.md](research/README.md). From the repository root:
 
