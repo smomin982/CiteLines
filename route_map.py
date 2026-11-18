@@ -8,10 +8,12 @@ import sqlite3
 from collections import defaultdict, deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from functools import cached_property
 from pathlib import Path
 from zipfile import ZipFile
 
 from research.pilot import END, START, URL, page
+from domains import page_site
 
 
 @dataclass(frozen=True)
@@ -102,6 +104,15 @@ class CitationNetwork:
             trials.append((key, backup, delta))
         return trials
 
+    @cached_property
+    def pages_by_site(self):
+        """Index only pages present in this cutoff snapshot."""
+        result = defaultdict(set)
+        for node in self.adj:
+            if not node.isdigit():
+                result[page_site(node)].add(node)
+        return dict(result)
+
     def first_connected(self, start, end):
         """Earliest eligible instant and a minimum-transfer path at that instant."""
         if not (start.isdigit() and end.isdigit() and start in self.adj and end in self.adj):
@@ -122,7 +133,7 @@ class CitationNetwork:
                     heapq.heappush(queue, (candidate, nxt))
         return None
 
-    def route(self, start, end, closed=None, *, through=None):
+    def route(self, start, end, closed=None, *, through=None, closed_site=None):
         """Return a shortest alternating path, or None for absent/unreachable posts."""
         if not (start.isdigit() and end.isdigit() and start in self.adj and end in self.adj):
             return None
@@ -131,6 +142,7 @@ class CitationNetwork:
         ):
             return None
         parent, todo = {start: None}, deque([start])
+        blocked = self.pages_by_site.get(closed_site, ()) if closed_site else ()
         while todo:
             u = todo.popleft()
             if u == end:
@@ -140,7 +152,7 @@ class CitationNetwork:
                     u = parent[u]
                 return path[::-1]
             for v in self.adj[u]:
-                if v != closed and v not in parent:
+                if v != closed and v not in parent and v not in blocked:
                     if through is not None:
                         edge = (u, v) if u.isdigit() else (v, u)
                         if self.evidence[edge].millis > through:

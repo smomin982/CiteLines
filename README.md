@@ -1,5 +1,7 @@
 # Community Notes Route Map
 
+**One page or the whole site?** Open **A backup that still needs the same site** under the guided cases. Removing X's gambling advertising policy page leaves a six-page detour between these two posts, but excluding all `x.com` citations disconnects them. Every route offers the same comparison, with independent page and site trials.
+
 **Connection history:** Choose **When did these posts first connect?** on a route, or open **A shortcut that appeared later** under the cases. The explorer compares the shortest chain at the first recorded connection with the chain at the selected cutoff.
 
 **[January research findings](research/study/FINDINGS.md):** 485 of 500 sampled connected pairs depended on at least one cited page. Select **What we found** in the explorer to compare the 2,812 individual page removals and inspect real examples.

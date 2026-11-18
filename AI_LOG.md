@@ -43,3 +43,8 @@
 
 - **Request:** Continue the contract review and defense preparation, defer the classmate exercise and packaging, and develop additional features.
 - **Kept:** An internal audit with source-to-database checks and an interactive first-connection view. The earliest complete chain can precede the current shortest chain; compare against rebuilding each snapshot on a small graph. Practice prompts tie design choices to actual measurements. External feedback remains pending.
+
+### 2026-11-18 — Page versus site closures
+
+- **Request:** Proceed with the proposed site-dependence feature after the history commit.
+- **Decision:** Compare two independent closures at the same cutoff using the bundled public suffix rules, rather than treating a hostname or publisher name as a site. Verified a sampled pair where a six-page backup survives removal of the specific page but no backup survives removal of its domain.

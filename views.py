@@ -3,6 +3,7 @@ from datetime import date, datetime, timezone
 from hashlib import sha256
 from html import escape
 from urllib.parse import unquote, urlencode, urlsplit
+from domains import page_site
 
 
 CAPTIONS = {
@@ -103,7 +104,41 @@ def render_view(params, snapshot, cases, parse_id):
                 f'<label>Destination (for a route)<input name="b" value="{escape(b)}"></label>'
                 f'<label>Include notes through (UTC)<input type="date" name="day" value="{day}" min="2025-01-01" max="2025-01-31"></label>'
                 '<button name="mode" value="route">Connect these posts</button><button name="mode" value="nearby">Explore from the start</button></form></details>')
-    if mode == "history":
+    if mode == "compare":
+        path = g.route(a, b)
+        body = ('<small>Source dependence</small><h2>One page or the whole site?</h2>'
+                '<p>Run two separate experiments on the same connection. First remove one cited page. '
+                'Restore it, then remove every cited page on its site. The X posts themselves stay in place.</p>')
+        if not path or len(path) < 3:
+            body += '<p>No shared page to test for this pair at the selected cutoff.</p>'
+        else:
+            pages = path[1::2]
+            key = params.get("page", pages[0])
+            if key not in pages:
+                raise ValueError("Choose a cited page on the selected route.")
+            domain = page_site(key)
+            page_backup = g.route(a, b, key)
+            site_backup = g.route(a, b, closed_site=domain)
+            body += f'<p>Original route: <b>{len(path)//2} shared page(s)</b>. Testing <b>{escape(title(key))}</b>.</p>'
+            for label, backup in ((f"Remove one page on {domain}", page_backup),
+                                  (f"Remove all cited pages on {domain}", site_backup)):
+                outcome = f"Connected via {len(backup)//2} shared page(s)" if backup else "Disconnected"
+                body += f'<article class="outcome"><small>{escape(label)}</small><h3>{outcome}</h3>'
+                if backup:
+                    body += '<details><summary>Inspect this surviving route</summary>'+chain(g, backup)+'</details>'
+                body += '</article>'
+            if page_backup and not site_backup:
+                body += f'<p><b>The backup still depends on {escape(domain)}.</b> Removing one page left a way around it, but every surviving chain used at least one page on that site.</p>'
+            elif site_backup:
+                body += '<p>A route survives without any cited page on this site. Different sites do not necessarily provide independent evidence.</p>'
+            else:
+                body += '<p>The chosen page alone was already indispensable.</p>'
+            body += f'<small>Site means registrable domain, including its subdomains. This is a URL grouping, not a publisher ownership check. Snapshot through {day} UTC.</small>'
+            if len(pages) > 1:
+                body += '<h3>Try another page from this route</h3><ul>'+''.join(
+                    '<li>'+link(title(k), mode="compare", page=k, **common)+'</li>' for k in pages if k != key)+'</ul>'
+        body += '<p>'+link("Back to the original connection →", mode="route", **common)+'</p>'
+    elif mode == "history":
         body = ('<small>Connection history</small><h2>When did a citation chain first exist?</h2>'
                 f'<p>Looking at notes through {day:%d %B %Y}, UTC. A chain becomes possible once '
                 'every citation along it has appeared in the archive.</p>')
@@ -166,13 +201,18 @@ def render_view(params, snapshot, cases, parse_id):
                 body += f'<article id="{trial_id(key)}" class="outcome"><small>{escape(label)} · single-page experiment</small><h3>{verdict}</h3><p>With <b>{escape(title(key))}</b> removed: {detail}</p>'
                 if backup:
                     body += '<details open><summary>Follow the backup route</summary>'+chain(g, backup)+'</details>'
+                body += '<p>'+link("Compare with removing the whole site →", mode="compare", page=key, **common)+'</p>'
                 body += '</article>'
+        if path and len(path) > 1 and mode != "stress":
+            body += '<p>'+link("Compare removing one page vs. its whole site →", mode="compare", **common)+'</p>'
         body += '<p>'+link("When did these posts first connect? →", mode="history", **common)+'</p>'
         body += '<p>'+link("Explore other posts connected to the starting post →", mode="nearby", **common)+'</p>'
     demos = " &nbsp;·&nbsp; ".join(link(label, a=c["before"][0], b=c["before"][-1])
                                    for label,c in (("German voting debate",cases["detour"]),("A sultan’s portrait",cases["disconnected"])))
     demos += " &nbsp;·&nbsp; " + link("A shortcut that appeared later", mode="history",
                                       a="1876209456205398444", b="1879258365798539578")
+    demos += " &nbsp;·&nbsp; " + link("A backup that still needs the same site", mode="compare",
+                                      a="1881948311512608793", b="1881974309570379974")
     return '<section class="story">'+body+'</section><aside><b>Try a case:</b> '+demos+'</aside>'+controls
 
 
