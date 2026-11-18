@@ -63,6 +63,13 @@ def card(post, *, auto=False, label="Original X post"):
             f'<a href="https://x.com/i/web/status/{ident}" target="_blank" rel="noreferrer">Open on X ↗</a></article>')
 
 
+def native_embed(post):
+    ident = escape(post)
+    return (f'<div class="native-post" data-embed-post="{ident}"><small>Original X post</small>'
+            '<div class="widget-slot"></div><p class="embed-status" role="status">Post preview</p>'
+            f'<a href="https://x.com/i/web/status/{ident}" target="_blank" rel="noreferrer">Open original on X ↗</a></div>')
+
+
 SCRIPT = """<script>
 for (const card of document.querySelectorAll('.xcard')) {
  const button=card.querySelector('button'), box=card.querySelector('.xcontent');
@@ -84,4 +91,44 @@ for (const card of document.querySelectorAll('.xcard')) {
  button.onclick=load;
  if(card.dataset.auto==='1') load();
 }
+
+// Only load X's official widget library on pages with embeds, near the viewport.
+let widgetLibrary;
+function widgets() {
+ if (window.twttr?.widgets?.createTweet) return Promise.resolve(window.twttr.widgets);
+ if (!widgetLibrary) widgetLibrary=new Promise((resolve,reject)=>{
+   const script=document.createElement('script'); script.async=true;
+   script.src='https://platform.twitter.com/widgets.js';
+   script.onload=()=>window.twttr?.ready ? window.twttr.ready(t=>resolve(t.widgets)) : reject(Error());
+   script.onerror=reject; document.head.append(script);
+ });
+ return widgetLibrary;
+}
+async function showEmbed(el) {
+ const id=el.dataset.embedPost, slot=el.querySelector('.widget-slot'), status=el.querySelector('.embed-status');
+ status.textContent='Loading original from X…';
+ let timer;
+ try {
+   const load=widgets().then(api=>api.createTweet(id,slot,{conversation:'none',dnt:true,align:'center'}));
+   const widget=await Promise.race([load,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error()),12000)})]);
+   if (!widget) throw Error();
+   status.hidden=true;
+ } catch {
+   slot.remove(); status.textContent='X embed unavailable.';
+   try {
+     const r=await fetch('/post-preview?id='+encodeURIComponent(id));
+     if (!r.ok) return;
+     const item=await r.json(), author=document.createElement('strong'), text=document.createElement('p');
+     author.textContent=item.author; text.textContent=item.text; text.dir='auto';
+     status.replaceChildren('Text preview · ',author,text);
+   } catch { /* The permalink and archived note remain usable. */ }
+ } finally { clearTimeout(timer); }
+}
+const embeds=document.querySelectorAll('[data-embed-post]');
+if(embeds.length && 'IntersectionObserver' in window){
+ const observer=new IntersectionObserver(entries=>{for(const e of entries)if(e.isIntersecting){
+   observer.unobserve(e.target); showEmbed(e.target);
+ }},{rootMargin:'250px'});
+ embeds.forEach(el=>observer.observe(el));
+}else embeds.forEach(showEmbed);
 </script>"""

@@ -50,3 +50,10 @@ def test_topic_drilldown_uses_matching_witnesses_and_preserves_date(db):
     assert "&lt;tag&gt;" in view and "<tag>" not in view
     with pytest.raises(ValueError):
         topic_view(db,dict(args,first="3"))
+
+
+def test_ranked_result_embeds_witness_post_not_note_or_other_matching_post(db):
+    view = topic_view(db,dict(q="red fox",day="2025-01-02"))
+    assert view.count('data-embed-post="1"') == 2
+    assert 'data-embed-post="10"' not in view and 'data-embed-post="2"' not in view
+    assert "Note 10" in view and "Note 11" in view

@@ -53,6 +53,10 @@ button,.action a{display:inline-block;background:var(--blue);color:white;border:
 .chain>.source:before{border-radius:2px;background:var(--orange)}.chain>li:last-child{border-color:transparent}.chain b,.chain small{display:block}
 .strip{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13px}.chip{padding:.15em .5em;background:white;border-radius:5px;border:1px solid var(--line)}
 .result{padding:20px 0;border-top:1px solid var(--line)}.result h3{margin:0 0 8px;font-size:20px}.result>a:first-child{font-weight:650}
+.topic-evidence{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
+.native-post,.note-side{padding:16px;border:1px solid var(--line);border-radius:12px;min-width:0}
+.native-post{background:white}.note-side{background:#eff4f1}.widget-slot{max-width:100%}.embed-status{color:var(--muted);font-size:14px}.native-post>a{font-size:13px}
+@media(max-width:760px){.topic-evidence{grid-template-columns:1fr}}
 .gauge{max-width:560px;height:8px;border-radius:6px;background:#dce3e7;margin:10px 0}.gauge i{display:block;height:100%;border-radius:inherit;background:#477a68}.gauge.detour i{background:#b16c29}.gauge.disconnected i{background:#475993}
 blockquote{margin:10px 0;padding:8px 16px;border-inline-start:3px solid #94aec9;background:#eef2f5;color:#304151}
 form{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px;background:#eef2f3;border-radius:12px;padding:18px;margin:16px 0}

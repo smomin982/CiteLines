@@ -4,7 +4,7 @@ from html import escape
 
 from topic_search import excerpt, has_table, matched_posts, ranked_pages
 from views import link, title
-from post_preview import card
+from post_preview import card, native_embed
 
 
 def topic_view(db, params):
@@ -39,9 +39,15 @@ def topic_view(db, params):
         if not rows:
             body.append('<p>No pages found here. Try a shorter phrase or a later cutoff.</p>')
         for key_id,count,rowid in rows[:20]:
+            note,text = excerpt(db,q,rowid)
+            post, = db.execute("SELECT post FROM citations WHERE note=? AND page=? AND millis<=? LIMIT 1",
+                               (note,key_id,cutoff)).fetchone()
             body.append('<article class="result"><h3>'+link(title(key_id),page=key_id,**common)+'</h3>'+
                         f'<p><b>{count:,}</b> matching post{"s" if count != 1 else ""}</p>'+
-                        witness(rowid)+'</article>')
+                        '<div class="topic-evidence">'+native_embed(post)+
+                        f'<div class="note-side"><small>Proposed Community Note on this post</small>'
+                        f'<blockquote dir="auto">{escape(text)}</blockquote><small>Note {escape(note)}</small>'
+                        '<p>'+link("Explore all matching posts →",page=key_id,**common)+'</p></div></div></article>')
         more = len(rows)>20
     else:
         body.append('<p>'+link("← Back to matching sources",**common)+'</p>')
