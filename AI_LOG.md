@@ -32,3 +32,9 @@
 
 - **Feedback:** The neighborhood screenshot exposed IDs and transfer counts without explaining what they meant.
 - **Change:** Lead with a guided example; label the two posts by what their proposed notes discuss, checked against the eight original witness summaries. For other destinations, identify the cited source instead of guessing the post's subject. Keep IDs, note dates, and raw evidence available on demand.
+
+### 2026-11-18 — Closure study and defense evidence
+
+- **Request:** Execute the 500-pair study, publish its findings in the interface, and benchmark the design.
+- **Choices:** Sample uniformly over connected unordered post pairs. Use independent closures and report pair and trial denominators separately. Keep the trial evidence in CSV, compare two exact representations on five prefixes, and check BFS against independently enumerated paths.
+- **Finding:** Pair-level fragility coexists with most individual removals leaving a route intact. Report both denominators and identify the contribution of single-page endpoints.

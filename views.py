@@ -1,5 +1,6 @@
 """Visitor-facing labels and views. Case captions describe notes, not unseen posts."""
 from datetime import date, datetime, timezone
+from hashlib import sha256
 from html import escape
 from urllib.parse import unquote, urlencode, urlsplit
 
@@ -30,6 +31,39 @@ def title(url):
 def link(text, **params):
     anchor = "#outcomes" if params.get("mode") == "stress" else ""
     return f'<a href="?{escape(urlencode(params))}{anchor}">{escape(text)}</a>'
+
+
+def trial_id(page):
+    return "trial-" + sha256(page.encode()).hexdigest()[:16]
+
+
+def findings(summary):
+    n, trials = summary["pairs"], summary["trials"]
+    fragile = summary["fragile_pairs"]
+    body = ['<section class="story"><small>January 2025 · Closure study</small>'
+            '<h2>How often does one source hold two posts together?</h2>',
+            f'<p>We randomly selected {n:,} connected post pairs. For each pair we found a shortest '
+            'citation chain, then removed and restored each page on that chain, one at a time.</p>',
+            f'<article class="outcome"><h3>{fragile/n:.1%} of pairs depended on at least one page</h3>'
+            f'<p>For {fragile:,} of {n:,} pairs, removing just one of their cited pages could eliminate '
+            'every route between them in this network.</p></article>',
+            f'<h3>What happened across {trials:,} individual removals?</h3>']
+    for kind, label in (("unchanged","A route just as short survived"),
+                        ("detour","Only a longer route survived"),
+                        ("disconnected","No route survived")):
+        count = summary["outcomes"].get(kind, 0)
+        body.append(f'<article class="result"><b>{count/trials:.1%} · {label}</b>'
+                    f'<p>{count:,} of {trials:,} page removals.')
+        if ex := summary["examples"].get(kind):
+            query = urlencode(dict(mode="stress", a=ex["a"], b=ex["b"], day="2025-01-31"))
+            body.append(f' <a href="?{escape(query)}#{trial_id(ex["closed"])}">Inspect a real case →</a>')
+        body.append("</p></article>")
+    body.append('<details><summary>How to interpret these percentages</summary><p>Pairs were sampled '
+                'uniformly without replacement from connected pairs, not from all X posts. Longer routes '
+                'contribute more removal trials. Tied shortest routes use sorted neighbor order. Results '
+                'measure shared URLs in this snapshot, not the independence or accuracy of the sources.</p>'
+                '</details><p><a href="/">Explore a guided example →</a></p></section>')
+    return "".join(body)
 
 
 def chain(g, path):
@@ -109,7 +143,7 @@ def render_view(params, snapshot, cases, parse_id):
                            "Another route is just as short." if not delta else "The connection survives, but takes a longer route.")
                 detail = ("No chain remains in this snapshot." if backup is None else
                           f"The shortest chain now uses {len(backup)//2} shared pages instead of {len(path)//2}.")
-                body += f'<article class="outcome"><small>{escape(label)} · single-page experiment</small><h3>{verdict}</h3><p>With <b>{escape(title(key))}</b> removed: {detail}</p>'
+                body += f'<article id="{trial_id(key)}" class="outcome"><small>{escape(label)} · single-page experiment</small><h3>{verdict}</h3><p>With <b>{escape(title(key))}</b> removed: {detail}</p>'
                 if backup:
                     body += '<details open><summary>Follow the backup route</summary>'+chain(g, backup)+'</details>'
                 body += '</article>'

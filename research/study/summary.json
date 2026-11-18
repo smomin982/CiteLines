@@ -1,0 +1,33 @@
+{
+  "seed": 507,
+  "pairs": 500,
+  "eligible_pairs": 140465276,
+  "components": 5151,
+  "trials": 2812,
+  "outcomes": {
+    "detour": 933,
+    "unchanged": 643,
+    "disconnected": 1236
+  },
+  "fragile_pairs": 485,
+  "examples": {
+    "detour": {
+      "a": "1881948311512608793",
+      "b": "1881974309570379974",
+      "closed": "https://business.x.com/en/help/ads-policies/ads-content-policies/gambling-content",
+      "transfers": 1
+    },
+    "unchanged": {
+      "a": "1874390046348038287",
+      "b": "1884256993692811563",
+      "closed": "https://business.x.com/en/help/ads-policies",
+      "transfers": 2
+    },
+    "disconnected": {
+      "a": "1875386092771533167",
+      "b": "1880163193089044936",
+      "closed": "https://business.x.com/en/help/ads-policies/ads-content-policies/gambling-content",
+      "transfers": 1
+    }
+  }
+}

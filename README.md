@@ -1,5 +1,7 @@
 # Community Notes Route Map
 
+**[January research findings](research/study/FINDINGS.md):** 485 of 500 sampled connected pairs depended on at least one cited page. Select **What we found** in the explorer to compare the 2,812 individual page removals and inspect real examples.
+
 Trace the shortest citation chain between two X posts and close a page to see whether the connection survives. The [approved proposal](PROPOSAL.md) describes the project, and [SPEC.md](SPEC.md) defines the checkpoint behavior.
 
 ## Run the checkpoint (PowerShell, Python 3.11+)

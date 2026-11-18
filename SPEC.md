@@ -21,3 +21,5 @@ BFS on the undirected bipartite adjacency lists minimizes edges and thus transfe
 A post-only graph gives O(P+L) BFS for P posts and L projected links, but must process a pair for every two posts citing each page during construction: a page with 1,000 posts creates 499,500 pair contributions instead of 1,000 edges. To handle closures the projection must retain supporting pages per pair or rebuild; deleting every pair supported by the closed page would erase valid equal-length backups.
 
 **Falsification line:** If exhaustive search on a small graph disagrees about minimum transfer count or reachability, or a result uses the excluded page or an edge supported only after the cutoff, the routing contract is broken.
+
+**Empirical evaluation:** The [January closure study](research/study/FINDINGS.md) documents the sampling frame, seed, denominators and measured build/query costs. The findings view links to trials at the study's January 31 cutoff.

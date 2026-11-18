@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 from route_map import Citation, CitationNetwork
-from views import STYLE, render_view
+from views import STYLE, findings, render_view
 
 ROOT = Path(__file__).resolve().parent
 CASES = json.loads((ROOT / "research/january.json").read_text(encoding="utf-8"))["cases"]
@@ -35,6 +35,8 @@ def post_id(value):
 
 
 def render(params, snapshot):
+    if params.get("mode") == "findings":
+        return findings(json.loads((ROOT / "research/study/summary.json").read_text(encoding="utf-8")))
     return render_view(params, snapshot, CASES, post_id)
 
 
@@ -63,7 +65,8 @@ def main():
                     f'content="width=device-width,initial-scale=1"><title>CiteLines</title><style>{STYLE}</style>'
                     '<main><header><small>CiteLines / January 2025</small><h1>What connects two posts on X?</h1>'
                     '<p>People write <b>Community Notes</b> to add context to posts on X. When notes on two posts link to the same page, '
-                    'CiteLines draws a connection. Follow one below, then see what happens without that source.</p></header>'
+                    'CiteLines draws a connection. Follow one below, then see what happens without that source.</p>'
+                    '<nav><a href="/">Explore a route</a> · <a href="?mode=findings">What we found</a></nav></header>'
                     + body + '<footer>Based on proposed notes in the January snapshot. A shared source does not imply agreement or influence.</footer></main></html>').encode()
             self.send_response(code)
             self.send_header("Content-Type", "text/html; charset=utf-8")
