@@ -12,3 +12,8 @@
 - **Request:** Do the prior-work review and January feasibility pilot on a separate branch.
 - **Method:** Compared related publications, graph datasets, and an existing dashboard. Selected the complete set of Notes shards for one snapshot and designed an offline scan with page-level keys, evidence IDs, and a second raw-row check of the selected examples.
 - **Decision:** Keep the originality claim limited to the scoped search; keep demonstration cases separate from any estimate of closure frequency.
+
+### Proposal drafting
+
+- **Request:** Proceed from the committed feasibility pilot to the topic-change proposal.
+- **Draft choices:** Used the verified German detour as the opening example and scoped delivery to January because the pilot already demonstrates both closure outcomes. Included the verified counts and qualified prior-work claim; left closure frequencies as a research question. Target grade A is proposed for student review. Instructor approval is pending.
