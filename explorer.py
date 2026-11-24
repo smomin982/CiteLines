@@ -22,6 +22,8 @@ from interactive_map import CASES as MAP_CASES, SCRIPT as MAP_SCRIPT, examples, 
 
 ROOT = Path(__file__).resolve().parent
 CASES = json.loads((ROOT / "data/english_cases.json").read_text(encoding="utf-8"))
+FONTS = {f"/assets/fonts/{name}": (ROOT / "assets/fonts" / name).read_bytes()
+         for name in ("manrope.woff2", "source-sans-3.woff2")}
 
 
 def load_network(db, day, english_ids=None):
@@ -93,6 +95,15 @@ def main():
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
             url = urlsplit(self.path)
+            if url.path in FONTS:
+                payload = FONTS[url.path]
+                self.send_response(200)
+                self.send_header("Content-Type", "font/woff2")
+                self.send_header("Cache-Control", "public, max-age=86400")
+                self.send_header("Content-Length", str(len(payload)))
+                self.end_headers()
+                self.wfile.write(payload)
+                return
             if url.path == "/post-preview":
                 post = parse_qs(url.query).get("id",[""])[0]
                 if not re.fullmatch(r"[0-9]{1,20}", post):

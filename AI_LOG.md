@@ -78,4 +78,5 @@
 - **Request:** Make source removal interactive and offer entry points by outcome.
 - **Decisions:** Compute original and independent closure states from the same cutoff graph; update only the route and evidence in the browser. Recheck case labels against the loaded English graph rather than displaying outdated outcomes from the multilingual study.
 - **First-visit feedback:** The student found the map confusing and the interface bland. Added an annotated A–source–B diagram, one prominent first action, and plain-language outcomes. Keep contributor notes separate from original posts and explain that simulated removals do not change X.
+- **Typography:** Replaced Georgia with Manrope for headings and Source Sans 3 for interface text. Bundled the fonts and their Open Font Licenses so the local app does not need to contact a font service. Embedded X posts retain X’s typography.
 - **Decisions:** Use SQLite FTS5 with literal phrase matching; remove URL strings before indexing. Join citations by note ID so unrelated notes on the same post cannot contribute pages. Keep work offline, support indexing an existing text-enabled database and use one local server.
