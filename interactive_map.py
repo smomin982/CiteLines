@@ -65,9 +65,15 @@ def route_strip(path, original, selected=None):
 def map_view(graph, a, b, day, library, default_page=None):
     route = graph.route(a,b)
     options = dict(a=a,b=b,day=str(day))
-    body = ('<section class="story"><div class="casehead"><div><small>Interactive route map</small>'
-            '<h1>What holds these posts together?</h1><p>Community Notes connect these posts by citing '
-            'shared pages. Remove a source to see what changes.</p></div></div>')
+    example = next((case[2] for case in CASES if (a,b)==case[3:5]), None)
+    badge = f"CASE FILE / {example}" if example else "SOURCE EXPERIMENT"
+    intro = ('Community Notes are written by contributors to add context to posts on X. '
+             'CiteLines follows the sources they cite to see what connects two posts.')
+    body = (f'<section class="story experiment"><div class="lab-hero"><div><small>{escape(badge)}</small>'
+            '<h1>Take away a source.<br><em>See what still connects.</em></h1>'
+            f'<p>{intro}</p></div><div class="lab-key"><small>HOW TO READ THE MAP</small>'
+            '<div><b>A</b><span></span><i>Source</i><span></span><b>B</b></div>'
+            '<p>Post A and Post B are linked when a Community Note on each cites the same page.</p></div></div>')
     if not route or len(route)<3:
         return (body+'<p>No citation chain between two distinct posts at this cutoff.</p><p>'+
                 link("Edit the posts or cutoff →",mode="route",**options)+'</p></section>'+library)
@@ -78,15 +84,21 @@ def map_view(graph, a, b, day, library, default_page=None):
         route, sources, i = [a,default_page,b], [default_page], 0
     else:
         i = 0
-    body += ('<div data-route-map><h2 class="map-title">Citation route</h2>'
-             f'<p>Verified English collection · through {day:%d %b %Y} UTC. Select a source, then try a removal.</p>'
-             '<div class="map-picks" role="group" aria-label="Source to inspect">')
+    body += ('<div data-route-map><div class="lab-heading"><div><small>01 / TRY THE EXPERIMENT</small>'
+             '<h2>Can these posts stay connected?</h2></div>'
+             f'<small>NOTES THROUGH {day:%d %b %Y} UTC</small></div>')
+    if len(sources)==1:
+        domain = page_site(sources[0])
+        host = "Reuters" if domain=="reuters.com" else escape(domain)
+        body += (f'<p>Both posts have a note citing the same {host} page. '
+                 'Remove it below to see if other cited pages can connect the posts.</p>')
+    else:
+        body += '<p>The posts connect through a chain of cited pages. Pick a page to test.</p>'
+    body += ('<div class="map-picks source-picker" role="group" aria-label="Source to inspect"'
+             +(' hidden' if len(sources)==1 else '')+'>')
     for n,key in enumerate(sources):
         body += f'<button type="button" data-source="{n}" aria-pressed="{str(n==i).lower()}">{escape(title(key))}</button>'
-    body += ('</div><div class="map-picks" role="group" aria-label="Route experiment">'
-             '<button type="button" data-state="original" aria-pressed="true">Original</button>'
-             '<button type="button" data-state="page" aria-pressed="false">Remove page</button>'
-             '<button type="button" data-state="site" aria-pressed="false">Remove site</button></div>')
+    body += '</div>'
     def result(key,state,path):
         site = page_site(key)
         what = {"original":"No sources removed", "page":f"Removed page: {title(key)}",
@@ -96,8 +108,23 @@ def map_view(graph, a, b, day, library, default_page=None):
         if path and state!="original":
             delta = count-len(route)//2
             status += f" · +{delta} vs. original" if delta else " · same length as original"
-        return (f'<p><strong>{status}</strong> <small>{escape(what)}</small></p>'
-                +route_strip(path,set(sources),sources.index(key) if state=="original" else None)+
+        if state=="original":
+            headline = "The starting connection"
+            explanation = ""
+        elif not path:
+            headline = "The connection breaks"
+            explanation = "The remaining notes do not provide a chain of shared sources between these posts."
+        elif count > len(route)//2:
+            headline = "The connection survives, with a detour"
+            explanation = ("The notes don’t need the original source to connect these posts. "
+                           "Follow the replacement pages and the posts that link them below.")
+        else:
+            headline = "Another route is just as short"
+            explanation = "Other cited pages can still connect these posts in the same number of steps."
+        return (f'<div class="lab-verdict {escape(state)}"><div><small>{escape(what)}</small>'
+                f'<h3>{headline}</h3></div><strong>{status}</strong></div>'
+                +(f'<p class="verdict-copy">{explanation}</p>' if explanation else "")+
+                route_strip(path,set(sources),sources.index(key) if state=="original" else None)+
                 ('<details><summary>Inspect the citations on this route</summary>'+chain(graph,path,previews=False)+'</details>' if path else ""))
     def evidence(key):
         j = route.index(key)
@@ -106,8 +133,13 @@ def map_view(graph, a, b, day, library, default_page=None):
                 f'target="_blank">{escape(title(key))} ↗</a></p><div class="postpair">'+ "".join(
                     f'<div><small>Proposed note {escape(c.note)} · post …{escape(p[-6:])}</small>{note_excerpt(c)}</div>'
                     for p,c in notes)+'</div>')
+    body += ('<div class="map-picks lab-actions" role="group" aria-label="Route experiment">'
+             '<button type="button" data-state="page" aria-pressed="false">Remove this page <span aria-hidden="true">→</span></button>'
+             '<button type="button" data-state="site" aria-pressed="false">Remove every page from this site</button>'
+             '<button type="button" data-state="original" aria-pressed="true">Restore original</button></div>'
+             '<p class="lab-help">This only changes the map. It doesn’t remove anything from X.</p>')
     body += '<div class="map-result" data-map-result aria-live="polite">'+result(sources[i],"original",route)+'</div>'
-    body += '<details class="map-notes" data-map-notes open><summary>Notes behind the selected source</summary><div>'+evidence(sources[i])+'</div></details>'
+    body += '<details class="map-notes" data-map-notes><summary>Read the two notes that cite this source</summary><div>'+evidence(sources[i])+'</div></details>'
     for n,key in enumerate(sources):
         paths = (("original",route),("page",graph.route(a,b,key)),
                  ("site",graph.route(a,b,closed_site=page_site(key))))
@@ -115,9 +147,10 @@ def map_view(graph, a, b, day, library, default_page=None):
             body += f'<template data-result="{n}-{state}">'+result(key,state,path)+'</template>'
         body += f'<template data-notes="{n}">'+evidence(key)+'</template>'
     body += ('<noscript><p>Use the '+link("static page/site comparison",mode="compare",page=sources[i],**options)+
-             ' if JavaScript is off.</p></noscript></div><h3>Original posts stay fixed</h3><div class="postpair">'
+             ' if JavaScript is off.</p></noscript></div><div class="lab-heading lab-posts"><div><small>02 / CHECK THE EVIDENCE</small>'
+             '<h2>The original posts</h2></div></div><p>These are the authors’ posts on X, not the notes written about them.</p><div class="postpair">'
              +card(a,auto=True,label="Original post · A")+card(b,auto=True,label="Original post · B")+'</div>')
-    body += '<p>'+link("Connection history →",mode="history",**options)+' · '+link("Try your own posts →",mode="route",**options)+'</p></section>'
+    body += '<p class="lab-links">'+link("See when these posts first connected →",mode="history",**options)+' · '+link("Look up a different pair →",mode="route",**options)+'</p></section>'
     return body+library
 
 
@@ -139,7 +172,12 @@ for (const map of document.querySelectorAll('[data-route-map]')) {
     }
   }
   for (const btn of source) btn.addEventListener('click',()=>{selected=btn.dataset.source;update(true);});
-  for (const btn of states) btn.addEventListener('click',()=>{state=btn.dataset.state;update(false);});
+  for (const btn of states) btn.addEventListener('click',()=>{
+    state=btn.dataset.state; update(false);
+    const result=map.querySelector('[data-map-result]');
+    if (result.getBoundingClientRect().top+115>window.innerHeight)
+      result.scrollIntoView({block:'start'});
+  });
   map.querySelector('[data-map-result]').addEventListener('click',e=>{
     const node=e.target.closest('[data-map-node]');
     if (!node) return;

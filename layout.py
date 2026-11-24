@@ -8,7 +8,7 @@ STYLE = (Path(__file__).parent/"atlas.css").read_text(encoding="utf-8")
 
 
 def frame(content, mode, script, count):
-    tabs = [("route","/","Walkthrough"),("topics","?mode=topics","Topics"),
+    tabs = [("route","/","Try it"),("topics","?mode=topics","Topics"),
             ("sources","?mode=sources","Sources"),("findings","?mode=findings","Findings")]
     active = mode if mode in {"topics","sources","findings"} else "route"
     links = "".join(f'<a href="{url}"'+(' aria-current="page"' if k==active else '')+

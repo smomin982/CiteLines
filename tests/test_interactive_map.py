@@ -23,6 +23,10 @@ def test_map_keeps_pair_fixed_and_distinguishes_single_page_from_site():
     assert "Disconnected" in sections["0-site"]
     assert re.findall(r'class="xcard" data-post="([0-9]+)"',text) == ["1","2"]
     assert "Witness 1" in text and "Witness 2" in text
+    assert text.index("Remove this page") < text.index("The original posts")
+    assert "The connection survives, with a detour" in sections["0-page"]
+    assert "The connection breaks" in sections["0-site"]
+    assert "This only changes the map" in text
 
 
 def test_case_library_omits_outcomes_that_no_longer_hold(monkeypatch):
