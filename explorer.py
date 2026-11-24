@@ -18,6 +18,7 @@ from topic_view import topic_view
 from contextlib import closing
 from post_preview import SCRIPT, preview
 from english_posts import collection, english, scope
+from interactive_map import CASES as MAP_CASES, SCRIPT as MAP_SCRIPT, examples, map_view
 
 ROOT = Path(__file__).resolve().parent
 CASES = json.loads((ROOT / "data/english_cases.json").read_text(encoding="utf-8"))
@@ -45,6 +46,17 @@ def post_id(value):
 
 
 def render(params, snapshot):
+    if not params or params.get("mode") == "map":
+        day = date.fromisoformat(params.get("day","2025-01-31"))
+        if not date(2025,1,1) <= day <= date(2025,1,31):
+            raise ValueError("Select a day in January 2025.")
+        full = date(2025,1,31)
+        graph = snapshot(day)
+        _,_,_,a,b = MAP_CASES[0]
+        if not params and not graph.route(a,b):
+            a,_,b = CASES["space"]["before"]
+        return map_view(graph,post_id(params.get("a",a)),post_id(params.get("b",b)),day,
+                        examples(graph if day==full else snapshot(full)),params.get("page"))
     if params.get("mode") == "findings":
         summaries = [json.loads((ROOT / "research/study" / f).read_text(encoding="utf-8"))
                      for f in ("summary.json","site_summary.json")]
@@ -121,7 +133,7 @@ def main():
                 code = 200
             except ValueError as exc:
                 body, code = f'<p>{escape(str(exc))}</p><a href="/">Reset explorer</a>', 400
-            html = frame(body,params.get("mode","route"),SCRIPT,len(english_ids)).encode()
+            html = frame(body,params.get("mode","route"),SCRIPT+MAP_SCRIPT,len(english_ids)).encode()
             self.send_response(code)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(html)))

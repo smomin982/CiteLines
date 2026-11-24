@@ -1,5 +1,7 @@
 # Community Notes Route Map
 
+**Interactive route map:** The homepage opens on a real English-language detour. Select a cited page to read its supporting notes, then switch between **Original**, **Remove page**, and **Remove site** without moving the post cards or reloading the page. The case library links to outcomes verified against the currently loaded English snapshot.
+
 **English originals only:** The interactive explorer and CLI use a curated set of 529 original posts that X tagged as English in its public embed. Unknown, unavailable-at-verification, and non-English originals are excluded from search counts and every routing hop. This is a verified subset, not a census of all English posts. Notes and external source pages are separate content and are not translated. The original multilingual archive stays intact for study reproduction.
 
 **Browse by interest:** Topics offers up to 35 suggested searches across six groups. Counts adapt to the cutoff, and any word or phrase is searchable. If an early cutoff hides results, the full-month link keeps the query intact. To extend the collection from the full archive, `py -3 -m research.expand_topics january.sqlite` selects new candidates by topic and adds only newly verified English originals.
@@ -22,9 +24,9 @@ Trace the shortest citation chain between two X posts and close a page to see wh
 
 ## Run the checkpoint (PowerShell, Python 3.11+)
 
-**Browser interface:** With the database built, run `py -3 explorer.py january.sqlite` and open **http://127.0.0.1:8765/**. On the original development machine the existing database is available at `"$env:LOCALAPPDATA\Temp\opencode\checkpoint-jan.sqlite"`. The local server uses the Python standard library. Stop it with Ctrl+C.
+**Browser interface:** With the database built, run `py -3 explorer.py january.sqlite` and open **http://127.0.0.1:8765/**. Keep the database outside the temporary folder if you want it to survive system cleanup; local `.sqlite` files are ignored by Git. The local server uses the Python standard library. Stop it with Ctrl+C.
 
-Start with the SpaceX funding or Los Angeles wildfires walkthrough. Follow the chain, then click **Remove that page and see what happens**.
+Start with the default funding-freeze case. Click **Remove page** to see its detour, or choose a different outcome from the case library.
 
 Download the five archives using the `$files` block in [research/README.md](research/README.md). From the repository root:
 

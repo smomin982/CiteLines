@@ -72,4 +72,9 @@
 
 - **Request:** Check the running app and finish the topic-coverage work.
 - **Decision:** Keep the verified English collection and preserve the exact phrase when widening the date range. Label the archived study with its original export date, independently of the explorer database.
+
+### 2026-11-24 — Interactive map and verified examples
+
+- **Request:** Make source removal interactive and offer entry points by outcome.
+- **Decisions:** Compute original and independent closure states from the same cutoff graph; update only the route and evidence in the browser. Recheck case labels against the loaded English graph rather than displaying outdated outcomes from the multilingual study.
 - **Decisions:** Use SQLite FTS5 with literal phrase matching; remove URL strings before indexing. Join citations by note ID so unrelated notes on the same post cannot contribute pages. Keep work offline, support indexing an existing text-enabled database and use one local server.

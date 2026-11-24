@@ -92,7 +92,7 @@ def note_excerpt(c):
     return f'<blockquote dir="auto">{escape(excerpt)}</blockquote>'
 
 
-def chain(g, path):
+def chain(g, path, *, previews=True):
     if not path:
         return "<p>There is no chain of shared pages between these posts by this date.</p>"
     nodes = []
@@ -101,7 +101,9 @@ def chain(g, path):
             role = "Starting post" if i == 0 else "Destination post" if i == len(path)-1 else "Connecting post"
             caption = CAPTIONS.get(item, "Post on X")
             nodes.append(f'<li class="post"><small>{role}</small><b>{escape(caption)}</b>'
-                         +card(item)+'</li>')
+                         +(card(item) if previews else
+                           f'<a href="https://x.com/i/web/status/{escape(item)}" target="_blank" rel="noreferrer">Open post on X ↗</a>')
+                         +'</li>')
         else:
             cites = [g.evidence[p, item] for p in (path[i-1], path[i+1])]
             proof = "".join(f"<li>Post {escape(c.post)} · note {escape(c.note)} · "
@@ -168,6 +170,7 @@ def render_view(params, snapshot, cases, parse_id):
             else:
                 body += '<p>The chosen page alone was already indispensable.</p>'
             body += f'<small>Site means registrable domain, including its subdomains. This is a URL grouping, not a publisher ownership check. Snapshot through {day} UTC.</small>'
+            body += '<p>'+link("Try these removals on the interactive map →",mode="map",page=key,**common)+'</p>'
             if len(pages) > 1:
                 body += '<h3>Try another page from this route</h3><ul>'+''.join(
                     '<li>'+link(title(k), mode="compare", page=k, **common)+'</li>' for k in pages if k != key)+'</ul>'
@@ -251,6 +254,7 @@ def render_view(params, snapshot, cases, parse_id):
                 body += '</article>'
         tools = []
         if path and len(path) > 1:
+            tools.append(link("Interactive route map →", mode="map", **common))
             tools.append(link("Page vs. whole site →", mode="compare", **common))
         tools += [link("Connection history →",mode="history",**common),
                   link("Nearby posts →",mode="nearby",**common)]

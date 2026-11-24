@@ -12,6 +12,8 @@ Read the five Notes TSV archives from X's November 17, 2026 snapshot ([source an
 
 ## Routing rules
 
+**Interactive map:** For a pair and cutoff, select any page on the displayed shortest route. The original, page-removed and site-removed states share endpoints and cutoff. The two removals are independent and highlight pages absent from the original route. The selected page's notes describe the original connection; the updated route has its own evidence. Suggested cases are displayed only if their outcome is reproduced in the loaded English collection through January 31.
+
 **Topic discovery:** Suggested searches are grouped by interest. A suggestion is shown only if it matches an eligible note on at least one verified English original by the selected UTC cutoff. Its count is the number of distinct matching posts (not pages or notes). A full-month recovery link for an empty search preserves the query and displays its actual January count. Free-form phrase search remains available.
 
 **Original posts (display only):** Look up a decimal post ID through X's public oEmbed endpoint. Display its reported author, post paragraph and publication date as text; link to X for media and threads. A failed lookup means the preview is unavailable, not that the post is known to have been deleted. Live previews can differ from the January archive and do not participate in indexing, counting, or routing.
