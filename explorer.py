@@ -26,7 +26,7 @@ CASES = json.loads((ROOT / "data/english_cases.json").read_text(encoding="utf-8"
 
 def load_network(db, day, english_ids=None):
     cutoff = int(datetime.combine(day, datetime.max.time(), timezone.utc).timestamp() * 1000)
-    with sqlite3.connect(db.as_uri() + "?mode=ro", uri=True) as conn:
+    with closing(sqlite3.connect(db.as_uri() + "?mode=ro", uri=True)) as conn:
         if english_ids is not None:
             scope(conn,english_ids)
         enriched = conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='note_text'").fetchone()

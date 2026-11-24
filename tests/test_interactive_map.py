@@ -1,7 +1,10 @@
 """A route switch cannot change endpoints or test a different page inadvertently."""
 from datetime import date
 import re
+import sqlite3
+from contextlib import closing
 
+from explorer import load_network
 from interactive_map import examples, map_view
 from route_map import Citation, CitationNetwork
 
@@ -29,3 +32,15 @@ def test_case_library_omits_outcomes_that_no_longer_hold(monkeypatch):
     graph = CitationNetwork([Citation(p,k,p,k,1) for p in ("1","2")],1)
     html = examples(graph)
     assert "Connection breaks" in html and "Needs a detour" not in html
+
+
+def test_loaded_snapshot_does_not_hold_database_open(tmp_path):
+    path = tmp_path/"map.sqlite"
+    with closing(sqlite3.connect(path)) as db:
+        db.execute("CREATE TABLE citations(post,page,note,raw,millis)")
+        db.executemany("INSERT INTO citations VALUES(?,?,?,?,?)",
+                       [(p,"https://example.org",p,"https://example.org",1) for p in ("1","2")])
+        db.commit()
+    graph = load_network(path,date(2025,1,31),["1","2"])
+    path.unlink()
+    assert graph.route("1","2") == ["1","https://example.org","2"]
