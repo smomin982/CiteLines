@@ -6,9 +6,13 @@ Given two decimal X post IDs, an inclusive cutoff instant and optionally one exc
 
 The interactive graph, CLI and searches filter the archive to original IDs with oEmbed paragraph `lang=en` (or an `en-` regional variant) recorded in `data/english_posts.json`. Verification samples shared-source neighborhoods (`english_posts.py`); it does not infer original language from contributor wording. Unknowns are excluded. The earlier closure study still runs on the unfiltered archive and its aggregates are explicitly labeled.
 
+The interactive explorer may use a later official cumulative export while retaining the same January 2025 note window and verified English allowlist. Deleted or revised notes can change counts and routes; such an export does not reproduce the archived study.
+
 Read the five Notes TSV archives from X's November 17, 2026 snapshot ([source and reproduction instructions](research/README.md)). Select `2025-01-01 ≤ createdAtMillis < 2025-02-01`, interpreted as UTC dates. Keep `tweetId` and `noteId` as decimal strings; extract explicit HTTP(S) URLs from `summary`. The pilot's frozen normalizer lowercases hosts, drops fragments and `utm_` parameters, retains paths and other query parameters, and flags common shorteners for exclusion. It does not fetch target pages. The network cannot infer missing links or restore deleted notes. SQLite retains distinct citations; repeated notes citing the same page on the same post create only one graph edge.
 
 ## Routing rules
+
+**Topic discovery:** Suggested searches are grouped by interest. A suggestion is shown only if it matches an eligible note on at least one verified English original by the selected UTC cutoff. Its count is the number of distinct matching posts (not pages or notes). A full-month recovery link for an empty search preserves the query and displays its actual January count. Free-form phrase search remains available.
 
 **Original posts (display only):** Look up a decimal post ID through X's public oEmbed endpoint. Display its reported author, post paragraph and publication date as text; link to X for media and threads. A failed lookup means the preview is unavailable, not that the post is known to have been deleted. Live previews can differ from the January archive and do not participate in indexing, counting, or routing.
 

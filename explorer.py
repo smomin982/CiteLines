@@ -50,8 +50,9 @@ def render(params, snapshot):
                      for f in ("summary.json","site_summary.json")]
         for summary in summaries:
             summary["examples"] = {}
-        return ('<aside><b>Archived study: all languages.</b> These figures describe the full January '
-                'network, not the verified English subset you can explore.</aside>'+findings(*summaries))
+        return ('<aside><b>Archived study: all languages.</b> These figures describe the January 2025 '
+                'network in the November 17, 2026 export, not the verified English subset you can explore.</aside>'
+                +findings(*summaries))
     if params.get("mode") in {"sources", "source_pair"}:
         day = date.fromisoformat(params.get("day","2025-01-31"))
         if not date(2025,1,1) <= day <= date(2025,1,31):

@@ -66,4 +66,10 @@
 - **Language scope:** At the student's request, limited visitor-facing post discovery and routing to verified English originals. Used X's language tag, changed the guided examples, and preserved the original research denominators separately.
 - **Interface iteration:** Reworked the walkthrough as an interactive citation atlas. Its diagram links to the two posts and the actual shared page; the same visual system now covers search, closure outcomes, and study findings.
 - **Topic results:** Added X's native embedded post alongside the exact contributor note used as each page's search witness. One note can support multiple page results; the post is not selected independently of the note. Verified the wildfire result renders a native X iframe.
+- **Topic coverage:** Replaced three static examples with positive-count suggestions grouped by interest. Selected additional candidates from matching notes across the month and checked original-post language before admission. Added a full-month option for restrictive cutoffs.
+
+### 2026-11-24 — Resume topic coverage
+
+- **Request:** Check the running app and finish the topic-coverage work.
+- **Decision:** Keep the verified English collection and preserve the exact phrase when widening the date range. Label the archived study with its original export date, independently of the explorer database.
 - **Decisions:** Use SQLite FTS5 with literal phrase matching; remove URL strings before indexing. Join citations by note ID so unrelated notes on the same post cannot contribute pages. Keep work offline, support indexing an existing text-enabled database and use one local server.

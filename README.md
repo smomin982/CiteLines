@@ -1,6 +1,8 @@
 # Community Notes Route Map
 
-**English originals only:** The interactive explorer and CLI use a curated set of 160 original posts that X tagged as English in its public embed. Unknown, unavailable-at-verification, and non-English originals are excluded from search counts and every routing hop. This is a verified subset, not a census of all English posts. Notes and external source pages are separate content and are not translated. The original multilingual archive stays intact for study reproduction.
+**English originals only:** The interactive explorer and CLI use a curated set of 529 original posts that X tagged as English in its public embed. Unknown, unavailable-at-verification, and non-English originals are excluded from search counts and every routing hop. This is a verified subset, not a census of all English posts. Notes and external source pages are separate content and are not translated. The original multilingual archive stays intact for study reproduction.
+
+**Browse by interest:** Topics offers up to 35 suggested searches across six groups. Counts adapt to the cutoff, and any word or phrase is searchable. If an early cutoff hides results, the full-month link keeps the query intact. To extend the collection from the full archive, `py -3 -m research.expand_topics january.sqlite` selects new candidates by topic and adds only newly verified English originals.
 
 **Start with the posts:** The walkthrough shows the two original X posts side by side, their shared citation, then a page-removal experiment. Text previews use X's public oEmbed service and include the reported author and date. Open the permalink for media or the live thread. Other result lists load previews on demand. A blocked or unavailable post does not prevent exploring locally archived notes.
 
@@ -14,7 +16,7 @@ On an article's page, read the proposed note excerpts, click **Start with this p
 
 **Connection history:** Choose **When did these posts first connect?** on a route to compare the shortest chain at the first recorded connection with the chain at the selected cutoff.
 
-**[January research findings](research/study/FINDINGS.md):** 485 of 500 sampled connected pairs depended on at least one cited page. Select **What we found** in the explorer to compare the 2,812 individual page removals and inspect real examples.
+**[January research findings](research/study/FINDINGS.md):** 485 of 500 sampled connected pairs depended on at least one cited page. Select **Findings** to see the results from the November 17, 2026 export. Those results are for the multilingual study, not the interactive English subset.
 
 Trace the shortest citation chain between two X posts and close a page to see whether the connection survives. The [approved proposal](PROPOSAL.md) describes the project, and [SPEC.md](SPEC.md) defines the checkpoint behavior.
 

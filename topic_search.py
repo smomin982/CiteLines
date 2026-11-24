@@ -45,6 +45,11 @@ def ranked_pages(db, q, cutoff, offset=0):
                       (phrase(q),cutoff,offset)).fetchall()
 
 
+def topic_count(db, q, cutoff):
+    """Eligible distinct posts, not notes, URLs or all-time totals."""
+    return db.execute("SELECT COUNT(DISTINCT c.post) "+MATCHES,(phrase(q),cutoff)).fetchone()[0]
+
+
 def matched_posts(db, q, cutoff, page):
     """One deterministic, matching witness per eligible post citing this page."""
     return db.execute("SELECT c.post, MIN(n.rowid) " + MATCHES +

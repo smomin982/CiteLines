@@ -4,6 +4,7 @@ from zipfile import ZipFile
 
 import pytest
 
+from english_posts import scope
 from route_map import START, build
 from topic_search import excerpt, matched_posts, ranked_pages
 from topic_view import topic_view
@@ -57,3 +58,19 @@ def test_ranked_result_embeds_witness_post_not_note_or_other_matching_post(db):
     assert view.count('data-embed-post="1"') == 2
     assert 'data-embed-post="10"' not in view and 'data-embed-post="2"' not in view
     assert "Note 10" in view and "Note 11" in view
+
+
+def test_suggestions_count_only_eligible_posts_and_recover_from_early_cutoff(db,monkeypatch):
+    monkeypatch.setattr("topic_view.GROUPS",{"Test":["red fox","quick fox","absent"]})
+    start = topic_view(db,dict(day="2025-01-01"))
+    assert "red fox · 1" in start and "quick fox · 1" in start and "absent" not in start
+    month = topic_view(db,{})
+    assert "red fox · 2" in month
+    early = topic_view(db,dict(day="2025-01-01",q="fox tag"))
+    assert "Search the full month: 1 matching post(s)" in early
+    partial = topic_view(db,dict(day="2025-01-01",q="red fox"))
+    assert "Search the full month →" in partial
+    scope(db,["1"])
+    filtered = topic_view(db,{})
+    assert "red fox · 1" in filtered and "quick fox" not in filtered
+    assert "Search the full month:" not in topic_view(db,dict(day="2025-01-01",q="fox tag"))

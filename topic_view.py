@@ -2,9 +2,32 @@
 from datetime import date, datetime, time, timezone
 from html import escape
 
-from topic_search import excerpt, has_table, matched_posts, ranked_pages
+from topic_search import excerpt, has_table, matched_posts, ranked_pages, topic_count
+from topic_catalog import GROUPS
+from research.pilot import END
 from views import link, title
 from post_preview import card, native_embed
+
+
+def discovery(db, cutoff, day):
+    sections = []
+    for group,terms in GROUPS.items():
+        chips = []
+        for term in terms:
+            count = topic_count(db,term,cutoff)
+            if count:
+                chips.append(link(f"{term} · {count:,}",mode="topics",day=str(day),q=term))
+        if chips:
+            sections.append(f'<div><h3>{escape(group)}</h3><div class="topic-chips">'+
+                            "".join(chips)+'</div></div>')
+    if not sections:
+        sections.append('<p>No suggested searches match this date. You can still search any word or phrase.</p>')
+    wider = ('<p>'+link("Browse the full January collection →",mode="topics",day="2025-01-31")+'</p>'
+             if str(day)!="2025-01-31" else '')
+    return ('<section class="story"><small>Browse by interest</small><h2>Pick a starting point</h2>'
+            f'<p>Each number counts different posts with a matching note through {day:%d %B}. '
+            'These are suggestions, not a limit on what you can search.</p><div class="topic-groups">'+
+            "".join(sections)+'</div>'+wider+'</section>')
 
 
 def topic_view(db, params):
@@ -20,12 +43,14 @@ def topic_view(db, params):
             '<form><input type="hidden" name="mode" value="topics"><label>Word or phrase'
             f'<input name="q" required maxlength="160" placeholder="gambling" value="{escape(q)}"></label>'
             f'<label>Through date (UTC)<input type="date" name="day" value="{day}" min="2025-01-01" max="2025-01-31"></label>'
-            '<button>Search notes</button></form><p>Try: ' +
-            ' · '.join(link(s,q=s,**common) for s in ("gambling","wildfire","democracy")) + '</p></section>']
+            '<button>Search notes</button></form><p>January 1 includes just one day of notes. '
+            'January 31 includes the full month. '+
+            (link("Use the full month →",mode="topics",day="2025-01-31",q=q)
+             if day.day != 31 and not q else '')+'</p></section>']
     if not has_table(db,"topic_fts"):
         return "".join(body)+'<p>Topic index unavailable. See the README for database setup.</p>'
     if not q:
-        return "".join(body)
+        return "".join(body)+discovery(db,cutoff,day)
     offset = max(0,int(params.get("offset","0")))
     common["q"] = q
     body.append('<section class="story">')
@@ -37,7 +62,14 @@ def topic_view(db, params):
         rows = ranked_pages(db,q,cutoff,offset)
         body.append(f'<h3>Pages cited in notes matching “{escape(q)}”</h3>')
         if not rows:
-            body.append('<p>No pages found here. Try a shorter phrase or a later cutoff.</p>')
+            body.append('<p>No matching pages through this date.</p>' if not offset else
+                        '<p>No more matching pages.</p>')
+            if not offset and cutoff < END-1 and (total := topic_count(db,q,END-1)):
+                body.append('<p>'+link(f'Search the full month: {total:,} matching post(s) →',
+                                      mode="topics",q=q,day="2025-01-31")+'</p>')
+            body.append(link("Browse topics with matches →",mode="topics",day=str(day)))
+        elif cutoff < END-1:
+            body.append('<p>'+link("Search the full month →",mode="topics",q=q,day="2025-01-31")+'</p>')
         for key_id,count,rowid in rows[:20]:
             note,text = excerpt(db,q,rowid)
             post, = db.execute("SELECT post FROM citations WHERE note=? AND page=? AND millis<=? LIMIT 1",
@@ -82,4 +114,4 @@ def topic_view(db, params):
         body.append(link("← Previous",offset=max(0,offset-20),**common))
     if more:
         body.append(link("Next 20 →",offset=offset+20,**common))
-    return "".join(body)+'</section>'
+    return "".join(body)+'</section><aside>'+link("Browse more topics →",mode="topics",day=str(day))+'</aside>'
