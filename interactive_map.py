@@ -45,11 +45,15 @@ def examples(graph):
             '</div></section>') if cards else ""
 
 
-def route_strip(path, original, selected=None):
+def route_strip(path, original, selected=None, *, compact=False):
     if path is None:
         return '<div class="route-track broken"><b>Post A</b><span>No surviving citation chain</span><b>Post B</b></div>'
     nodes = ['<div class="route-track"><b>Post A</b>']
     for i,key in enumerate(path[1::2]):
+        name = title(key)
+        if compact:
+            domain = page_site(key)
+            name = {"reuters.com":"Reuters","apnews.com":"AP News","kiplinger.com":"Kiplinger"}.get(domain,domain)
         if i:
             nodes.append('<span class="via-post">Connecting post</span>')
         if selected is not None:
@@ -57,7 +61,7 @@ def route_strip(path, original, selected=None):
                          f'aria-pressed="{str(i==selected).lower()}">{escape(title(key))}</button>')
         else:
             state, tag = ("retained","") if key in original else ("added","<small>New · </small>")
-            nodes.append(f'<span class="map-source {state}">{tag}{escape(title(key))}</span>')
+            nodes.append(f'<span class="map-source {state}" title="{escape(title(key))}">{tag}{escape(name)}</span>')
     nodes.extend(['<b>Post B</b>', '</div>'])
     return "".join(nodes)
 
@@ -84,14 +88,14 @@ def map_view(graph, a, b, day, library, default_page=None):
         route, sources, i = [a,default_page,b], [default_page], 0
     else:
         i = 0
-    body += ('<div data-route-map><div class="lab-heading"><div><small>01 / TRY THE EXPERIMENT</small>'
+    body += ('<div data-route-map><div class="lab-heading"><div><small>01 / ONE-CLICK DEMO</small>'
              '<h2>Can these posts stay connected?</h2></div>'
              f'<small>NOTES THROUGH {day:%d %b %Y} UTC</small></div>')
     if len(sources)==1:
         domain = page_site(sources[0])
         host = "Reuters" if domain=="reuters.com" else escape(domain)
-        body += (f'<p>Both posts have a note citing the same {host} page. '
-                 'Remove it below to see if other cited pages can connect the posts.</p>')
+        body += (f'<p>Both posts have a note citing the same <strong>{host} page</strong>. '
+                 'Is that page the only link between them?</p>')
     else:
         body += '<p>The posts connect through a chain of cited pages. Pick a page to test.</p>'
     body += ('<div class="map-picks source-picker" role="group" aria-label="Source to inspect"'
@@ -105,9 +109,6 @@ def map_view(graph, a, b, day, library, default_page=None):
                 "site":f"Removed every cited page on {site}"}[state]
         count = len(path)//2 if path else 0
         status = (f'{count} shared {"page" if count==1 else "pages"}' if path else "Disconnected")
-        if path and state!="original":
-            delta = count-len(route)//2
-            status += f" · +{delta} vs. original" if delta else " · same length as original"
         if state=="original":
             headline = "The starting connection"
             explanation = ""
@@ -116,15 +117,23 @@ def map_view(graph, a, b, day, library, default_page=None):
             explanation = "The remaining notes do not provide a chain of shared sources between these posts."
         elif count > len(route)//2:
             headline = "The connection survives, with a detour"
-            explanation = ("The notes don’t need the original source to connect these posts. "
-                           "Follow the replacement pages and the posts that link them below.")
+            middle = "one other post" if count==2 else f"{count-1} other posts"
+            explanation = f"The same two posts are now linked through {count} cited pages and {middle}."
         else:
             headline = "Another route is just as short"
             explanation = "Other cited pages can still connect these posts in the same number of steps."
+        view = route_strip(path,set(sources),sources.index(key) if state=="original" else None,
+                           compact=state!="original")
+        if state!="original":
+            initial = len(route)//2
+            unit = "page" if initial==1 else "pages"
+            view = (f'<div class="demo-compare"><section class="demo-before"><small>Before · No removals</small>'
+                    f'<h4>{initial} shared {unit}</h4>{route_strip(route,set(sources),compact=True)}</section>'
+                    f'<section class="demo-after"><small>After · {"Page removed" if state=="page" else "Site removed"}</small>'
+                    f'<h4>{status}</h4>{view}</section></div>')
         return (f'<div class="lab-verdict {escape(state)}"><div><small>{escape(what)}</small>'
-                f'<h3>{headline}</h3></div><strong>{status}</strong></div>'
-                +(f'<p class="verdict-copy">{explanation}</p>' if explanation else "")+
-                route_strip(path,set(sources),sources.index(key) if state=="original" else None)+
+                f'<h3>{headline}</h3></div>'+ (f'<strong>{status}</strong>' if state=="original" else "")+'</div>'
+                +(f'<p class="verdict-copy">{explanation}</p>' if explanation else "")+view+
                 ('<details><summary>Inspect the citations on this route</summary>'+chain(graph,path,previews=False)+'</details>' if path else ""))
     def evidence(key):
         j = route.index(key)
@@ -133,12 +142,15 @@ def map_view(graph, a, b, day, library, default_page=None):
                 f'target="_blank">{escape(title(key))} ↗</a></p><div class="postpair">'+ "".join(
                     f'<div><small>Proposed note {escape(c.note)} · post …{escape(p[-6:])}</small>{note_excerpt(c)}</div>'
                     for p,c in notes)+'</div>')
+    action = "Remove this page" if len(sources)==1 else "Remove selected page"
     body += ('<div class="map-picks lab-actions" role="group" aria-label="Route experiment">'
-             '<button type="button" data-state="page" aria-pressed="false">Remove this page <span aria-hidden="true">→</span></button>'
-             '<button type="button" data-state="site" aria-pressed="false">Remove every page from this site</button>'
-             '<button type="button" data-state="original" aria-pressed="true">Restore original</button></div>'
+             f'<button type="button" data-state="page" aria-pressed="false">{action} <span aria-hidden="true">→</span></button>'
+             '<button type="button" data-state="original" aria-pressed="true" hidden>Reset demo</button></div>'
              '<p class="lab-help">This only changes the map. It doesn’t remove anything from X.</p>')
     body += '<div class="map-result" data-map-result aria-live="polite">'+result(sources[i],"original",route)+'</div>'
+    body += ('<details class="map-notes demo-followup"><summary>Want to go further? Try removing the whole site</summary>'
+             '<p>This removes all citations from the selected website instead of just one page.</p>'
+             '<button type="button" data-state="site" aria-pressed="false">Remove the whole site</button></details>')
     body += '<details class="map-notes" data-map-notes><summary>Read the two notes that cite this source</summary><div>'+evidence(sources[i])+'</div></details>'
     for n,key in enumerate(sources):
         paths = (("original",route),("page",graph.route(a,b,key)),
@@ -164,6 +176,7 @@ for (const map of document.querySelectorAll('[data-route-map]')) {
   function update(updateNotes) {
     for (const btn of source) btn.setAttribute('aria-pressed', btn.dataset.source===selected);
     for (const btn of states) btn.setAttribute('aria-pressed', btn.dataset.state===state);
+    map.querySelector('[data-state=original]').hidden = state==='original';
     map.querySelector('[data-map-result]').replaceChildren(copy(`[data-result="${selected}-${state}"]`));
     if (updateNotes) {
       const notes = map.querySelector('[data-map-notes]');
@@ -175,7 +188,8 @@ for (const map of document.querySelectorAll('[data-route-map]')) {
   for (const btn of states) btn.addEventListener('click',()=>{
     state=btn.dataset.state; update(false);
     const result=map.querySelector('[data-map-result]');
-    if (result.getBoundingClientRect().top+115>window.innerHeight)
+    if (state==='original') map.querySelector('[data-state=page]').focus();
+    if (result.getBoundingClientRect().top+115>window.innerHeight || state==='site')
       result.scrollIntoView({block:'start'});
   });
   map.querySelector('[data-map-result]').addEventListener('click',e=>{

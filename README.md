@@ -2,6 +2,8 @@
 
 **Interactive route map:** The homepage opens on a real English-language detour. Select a cited page to read its supporting notes, then switch between **Original**, **Remove page**, and **Remove site** without moving the post cards or reloading the page. The case library links to outcomes verified against the currently loaded English snapshot.
 
+**Presentation:** Start at the homepage with the original route visible. Say, “Two Community Notes cite the same Reuters article. Is it the only thing connecting these posts?” Click **Remove this page**. Point to the before and after panels: “The connection survives, but now it goes through AP News, another post, and Kiplinger.” If asked what changed on X, explain that this is a simulation using archived citations. **Reset demo** returns to the starting state.
+
 **English originals only:** The interactive explorer and CLI use a curated set of 529 original posts that X tagged as English in its public embed. Unknown, unavailable-at-verification, and non-English originals are excluded from search counts and every routing hop. This is a verified subset, not a census of all English posts. Notes and external source pages are separate content and are not translated. The original multilingual archive stays intact for study reproduction.
 
 **Browse by interest:** Topics offers up to 35 suggested searches across six groups. Counts adapt to the cutoff, and any word or phrase is searchable. If an early cutoff hides results, the full-month link keeps the query intact. To extend the collection from the full archive, `py -3 -m research.expand_topics january.sqlite` selects new candidates by topic and adds only newly verified English originals.

@@ -112,5 +112,11 @@ footer{margin:28px 0 36px;padding-top:18px;border-top:1px solid var(--line);font
 .lab-actions button[data-state=page]:hover{background:#ffe393}.lab-actions button[aria-pressed=true]{background:var(--lab);color:white;border-color:var(--lab)}
 .lab-actions button[data-state=page] span{margin-left:8px}.lab-help{font-size:13px;color:var(--muted);margin:0 0 15px}
 .lab-posts{padding-top:24px;border-top:1px solid var(--line);margin-top:26px}.lab-links{margin-top:16px}
+.lab-actions [hidden]{display:none}
+.demo-compare{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin:12px 0}
+.demo-compare>section{min-width:0;background:var(--paper);padding:14px;border:1px solid var(--line);border-radius:10px}
+.demo-compare .demo-after{background:#f7fffb;border-color:#97beab}.demo-compare small{color:var(--muted)}
+.demo-compare h4{font:800 20px/1.2 var(--display);margin:4px 0}.demo-followup button{margin-top:4px}
+@media(max-width:650px){.demo-compare{grid-template-columns:1fr}}
 @media(max-width:760px){.lab-hero{grid-template-columns:1fr}.lab-key{padding:12px}.lab-key>div{max-width:300px;margin:8px 0}.lab-heading{gap:4px}}
 @media(max-width:560px){.lab-hero{padding:18px 16px;gap:12px}.lab-hero p{font-size:14px}.lab-key p{font-size:12px}.lab-heading{margin-top:16px}.lab-actions button{padding:8px 10px}.experiment .map-result{padding:12px}}

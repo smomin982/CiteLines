@@ -27,6 +27,11 @@ def test_map_keeps_pair_fixed_and_distinguishes_single_page_from_site():
     assert "The connection survives, with a detour" in sections["0-page"]
     assert "The connection breaks" in sections["0-site"]
     assert "This only changes the map" in text
+    assert "Before · No removals" not in sections["0-original"]
+    for state, label in (("page", "Page removed"), ("site", "Site removed")):
+        result = sections[f"0-{state}"]
+        assert result.index("Before · No removals") < result.index("After · " + label)
+    assert 'data-state="original" aria-pressed="true" hidden' in text
 
 
 def test_case_library_omits_outcomes_that_no_longer_hold(monkeypatch):
